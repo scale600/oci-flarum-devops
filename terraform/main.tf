@@ -195,6 +195,7 @@ resource "oci_core_instance" "flarum_instance" {
       mysql_user          = var.mysql_user
       mysql_password      = var.mysql_password
       flarum_public_ip    = oci_core_instance.flarum_instance.public_ip
+      domain_name         = var.domain_name
     }))
   }
 
