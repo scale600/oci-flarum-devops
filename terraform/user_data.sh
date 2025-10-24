@@ -86,7 +86,7 @@ EOF
 
 # Create environment variables file
 cat > .env << EOF
-FLARUM_PUBLIC_IP=${flarum_instance_public_ip}
+FLARUM_PUBLIC_IP=${flarum_public_ip}
 MYSQL_ROOT_PASSWORD=${mysql_root_password}
 MYSQL_DATABASE=${mysql_database}
 MYSQL_USER=${mysql_user}
