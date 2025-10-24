@@ -50,7 +50,7 @@ services:
       - UID=1000
       - GID=1000
       - DEBUG=false
-      - FORUM_URL=http://${FLARUM_PUBLIC_IP}
+      - FORUM_URL=http://${flarum_public_ip}
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_NAME=${MYSQL_DATABASE}
