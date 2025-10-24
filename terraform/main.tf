@@ -191,11 +191,11 @@ resource "oci_core_instance" "flarum_instance" {
     ssh_authorized_keys = var.ssh_public_key
     user_data = base64encode(templatefile("${path.module}/user_data.sh", {
       mysql_root_password = var.mysql_root_password
-      mysql_database      = var.mysql_database
-      mysql_user          = var.mysql_user
-      mysql_password      = var.mysql_password
-      flarum_public_ip    = oci_core_instance.flarum_instance.public_ip
-      domain_name         = var.domain_name
+      mysql_database    = var.mysql_database
+      mysql_user        = var.mysql_user
+      mysql_password    = var.mysql_password
+      flarum_public_ip  = "SELF_IP"
+      domain_name       = var.domain_name
     }))
   }
 
