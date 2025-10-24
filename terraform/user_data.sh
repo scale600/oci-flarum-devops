@@ -85,14 +85,14 @@ networks:
 EOF
 
 # Get the actual public IP address and replace placeholder
-REAL_IP=$(curl -s http://169.254.169.254/opc/v1/vnics/ | jq -r '.[0].publicIp')
+CURRENT_IP=$(curl -s http://169.254.169.254/opc/v1/vnics/ | jq -r '.[0].publicIp')
 
 # Replace placeholder IP in docker-compose.yml
-sed -i "s/PLACEHOLDER_IP/${REAL_IP}/g" docker-compose.yml
+sed -i "s/PLACEHOLDER_IP/$CURRENT_IP/g" docker-compose.yml
 
 # Create environment variables file
 cat > .env << EOF
-FLARUM_PUBLIC_IP=${REAL_IP}
+FLARUM_PUBLIC_IP=$CURRENT_IP
 MYSQL_ROOT_PASSWORD=${mysql_root_password}
 MYSQL_DATABASE=${mysql_database}
 MYSQL_USER=${mysql_user}
@@ -135,5 +135,5 @@ EOF
 chmod +x /home/opc/setup-ssl.sh
 
 echo "Flarum setup completed!"
-echo "Access your forum at: http://${REAL_IP}"
+echo "Access your forum at: http://$CURRENT_IP"
 echo "To setup SSL, run: /home/opc/setup-ssl.sh"
