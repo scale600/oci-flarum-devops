@@ -10,19 +10,8 @@ RUN apk add --no-cache \
 # Flarum 확장 프로그램 디렉토리 생성
 RUN mkdir -p /flarum/app/extensions
 
-# 기본 확장 프로그램 설치
-RUN php /flarum/app/flarum extension:install flarum-seo && \
-    php /flarum/app/flarum extension:install flarum-markdown && \
-    php /flarum/app/flarum extension:install flarum-tags && \
-    php /flarum/app/flarum extension:install flarum-sticky && \
-    php /flarum/app/flarum extension:install flarum-subscriptions && \
-    php /flarum/app/flarum extension:install flarum-mentions && \
-    php /flarum/app/flarum extension:install flarum-approval && \
-    php /flarum/app/flarum extension:install flarum-suspend && \
-    php /flarum/app/flarum extension:install flarum-lock
-
-# 한국어 언어팩 설치 (선택사항)
-# RUN flarum extension:install flarum-lang-korean
+# 확장 프로그램은 런타임에 설치하도록 변경
+# 기본 Flarum 이미지 사용 (확장 프로그램 설치 제거)
 
 # Flarum 설정 스크립트
 COPY flarum-setup.sh /usr/local/bin/flarum-setup.sh
