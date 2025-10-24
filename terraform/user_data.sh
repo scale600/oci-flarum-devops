@@ -129,5 +129,5 @@ EOF
 chmod +x /home/opc/setup-ssl.sh
 
 echo "Flarum setup completed!"
-echo "Access your forum at: http://${flarum_instance_public_ip}"
+echo "Access your forum at: http://${flarum_public_ip}"
 echo "To setup SSL, run: /home/opc/setup-ssl.sh"
