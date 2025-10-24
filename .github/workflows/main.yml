@@ -128,7 +128,7 @@ jobs:
   # Step 2: Ansible Configuration Deployment
   ansible-deploy:
     name: Configure Services
-    needs: terraform-deploy
+    needs: [terraform-deploy, docker-deploy]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     defaults:
@@ -189,7 +189,7 @@ jobs:
   # Step 3: Docker Image Build and Deployment
   docker-deploy:
     name: Build and Deploy Docker Images
-    needs: [terraform-deploy, ansible-deploy]
+    needs: [terraform-deploy]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
@@ -275,7 +275,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy with Ansible
+      - name: Verify Deployment
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ needs.terraform-deploy.outputs.web_ip }}
@@ -283,9 +283,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/flarum
-            docker-compose pull
-            docker-compose up -d
             docker-compose ps
+            docker-compose logs --tail=20
 
       - name: Setup SSH for Health Check
         run: |
@@ -297,10 +296,19 @@ jobs:
       - name: Health Check
         run: |
           echo "Performing health checks..."
-          sleep 30
+          sleep 60  # Wait for services to fully start
 
-          # HTTP response check
-          curl -f http://${{ needs.terraform-deploy.outputs.web_ip }} || exit 1
+          # HTTP response check with retry
+          for i in {1..5}; do
+            echo "Health check attempt $i/5"
+            if curl -f http://${{ needs.terraform-deploy.outputs.web_ip }}; then
+              echo "✅ Health check passed"
+              break
+            else
+              echo "❌ Health check failed, retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
 
           # Check Docker container status
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa opc@${{ needs.terraform-deploy.outputs.web_ip }} "docker ps"
