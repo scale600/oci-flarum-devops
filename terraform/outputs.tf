@@ -14,16 +14,7 @@ output "flarum_instance_ocid" {
   value       = oci_core_instance.flarum_instance.id
 }
 
-# MySQL 데이터베이스 정보
-output "mysql_instance_private_ip" {
-  description = "Private IP address of MySQL instance"
-  value       = oci_core_instance.mysql_instance.private_ip
-}
-
-output "mysql_instance_ocid" {
-  description = "OCID of MySQL instance"
-  value       = oci_core_instance.mysql_instance.id
-}
+# MySQL은 Docker 컨테이너로 통합됨
 
 # 네트워크 정보
 output "vcn_id" {
@@ -52,11 +43,11 @@ output "ssh_connection_command" {
   value       = "ssh opc@${oci_core_instance.flarum_instance.public_ip}"
 }
 
-# 설정 정보
+# MySQL 연결 정보 (Docker 컨테이너)
 output "mysql_connection_info" {
-  description = "MySQL connection information"
+  description = "MySQL connection information (Docker container)"
   value = {
-    host     = oci_core_instance.mysql_instance.private_ip
+    host     = "localhost"
     port     = 3306
     database = var.mysql_database
     username = var.mysql_user
@@ -71,12 +62,12 @@ output "resource_summary" {
     flarum_instance = {
       name        = oci_core_instance.flarum_instance.display_name
       public_ip   = oci_core_instance.flarum_instance.public_ip
-      shape       = "VM.Standard.A1.Flex (2 OCPU, 12GB RAM)"
+      shape       = "VM.Standard.E2.1.Micro (1 OCPU, 1GB RAM)"
     }
-    mysql_instance = {
-      name        = oci_core_instance.mysql_instance.display_name
-      private_ip  = oci_core_instance.mysql_instance.private_ip
-      shape       = "VM.Standard.A1.Flex (1 OCPU, 6GB RAM)"
+    mysql_container = {
+      description = "MySQL running as Docker container on same instance"
+      host        = "localhost"
+      port        = 3306
     }
     network = {
       vcn_id           = oci_core_vcn.flarum_vcn.id

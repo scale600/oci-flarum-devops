@@ -200,36 +200,4 @@ resource "oci_core_instance" "flarum_instance" {
   }
 }
 
-# MySQL 데이터베이스 인스턴스 (프라이빗 서브넷)
-resource "oci_core_instance" "mysql_instance" {
-  compartment_id      = var.compartment_id
-  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
-  display_name        = "flarum-mysql-db"
-  shape               = "VM.Standard.E2.1.Micro"
-
-  source_details {
-    source_type = "image"
-    source_id   = data.oci_core_images.oracle_linux.images[0].id
-  }
-
-  create_vnic_details {
-    subnet_id        = oci_core_subnet.flarum_private_subnet.id
-    display_name     = "mysql-vnic"
-    assign_public_ip = false
-    hostname_label   = "mysql"
-  }
-
-  metadata = {
-    ssh_authorized_keys = var.ssh_public_key
-    user_data = base64encode(templatefile("${path.module}/mysql_user_data.sh", {
-      mysql_root_password = var.mysql_root_password
-      mysql_database      = var.mysql_database
-      mysql_user          = var.mysql_user
-      mysql_password      = var.mysql_password
-    }))
-  }
-
-  timeouts {
-    create = "10m"
-  }
-}
+# MySQL 인스턴스 제거 - Docker 컨테이너로 통합

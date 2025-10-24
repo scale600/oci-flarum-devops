@@ -194,7 +194,7 @@ jobs:
             ### 📊 Deployment Summary
             - **Flarum URL**: ${outputs.flarum_url?.value || 'N/A'}
             - **Flarum Public IP**: ${outputs.flarum_instance_public_ip?.value || 'N/A'}
-            - **MySQL Private IP**: ${outputs.mysql_instance_private_ip?.value || 'N/A'}
+            - **MySQL**: localhost (Docker container)
 
             ### 🔗 Access Information
             - **SSH Command**: \`${outputs.ssh_connection_command?.value || 'N/A'}\`

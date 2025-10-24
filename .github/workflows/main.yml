@@ -114,11 +114,10 @@ jobs:
         id: terraform-output
         run: |
           WEB_IP=$(terraform output -raw flarum_instance_public_ip)
-          MYSQL_IP=$(terraform output -raw mysql_instance_private_ip)
           echo "web_ip=$WEB_IP" >> $GITHUB_OUTPUT
-          echo "mysql_ip=$MYSQL_IP" >> $GITHUB_OUTPUT
+          echo "mysql_ip=localhost" >> $GITHUB_OUTPUT
           echo "Web Server IP: $WEB_IP"
-          echo "MySQL IP: $MYSQL_IP"
+          echo "MySQL: localhost (Docker container)"
 
       - name: Wait for instances to be ready
         run: |
