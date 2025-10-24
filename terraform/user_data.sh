@@ -53,9 +53,9 @@ services:
       - FORUM_URL=http://${flarum_public_ip}
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_NAME=${MYSQL_DATABASE}
-      - DB_USER=${MYSQL_USER}
-      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=${mysql_database}
+      - DB_USER=${mysql_user}
+      - DB_PASSWORD=${mysql_password}
     depends_on:
       - mysql
     networks:
@@ -66,10 +66,10 @@ services:
     container_name: flarum_mysql
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${mysql_root_password}
+      - MYSQL_DATABASE=${mysql_database}
+      - MYSQL_USER=${mysql_user}
+      - MYSQL_PASSWORD=${mysql_password}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
