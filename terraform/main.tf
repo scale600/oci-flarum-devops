@@ -27,8 +27,10 @@ data "oci_identity_availability_domains" "ads" {
 data "oci_core_images" "oracle_linux" {
   compartment_id   = var.compartment_id
   operating_system = "Oracle Linux"
-  sort_by         = "TIMECREATED"
-  sort_order      = "DESC"
+  operating_system_version = "8"
+  shape            = "VM.Standard.E2.1.Micro"
+  sort_by          = "TIMECREATED"
+  sort_order       = "DESC"
 }
 
 # VCN 생성
@@ -168,12 +170,6 @@ resource "oci_core_instance" "flarum_instance" {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   display_name        = "flarum-web-server"
   shape               = "VM.Standard.E2.1.Micro"
-  
-  # Always Free Tier 스펙
-  shape_config {
-    ocpus         = 1
-    memory_in_gbs = 1
-  }
 
   source_details {
     source_type = "image"
@@ -210,12 +206,6 @@ resource "oci_core_instance" "mysql_instance" {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   display_name        = "flarum-mysql-db"
   shape               = "VM.Standard.E2.1.Micro"
-  
-  # Always Free Tier 스펙 (더 작은 리소스)
-  shape_config {
-    ocpus         = 1
-    memory_in_gbs = 1
-  }
 
   source_details {
     source_type = "image"
