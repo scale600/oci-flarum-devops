@@ -50,7 +50,7 @@ services:
       - UID=1000
       - GID=1000
       - DEBUG=false
-      - FORUM_URL=http://${flarum_public_ip}
+      - FORUM_URL=http://${ACTUAL_PUBLIC_IP}
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_NAME=${mysql_database}
@@ -84,9 +84,12 @@ networks:
     driver: bridge
 EOF
 
+# Get the actual public IP address
+ACTUAL_PUBLIC_IP=$(curl -s http://169.254.169.254/opc/v1/vnics/ | jq -r '.[0].publicIp')
+
 # Create environment variables file
 cat > .env << EOF
-FLARUM_PUBLIC_IP=${flarum_public_ip}
+FLARUM_PUBLIC_IP=${ACTUAL_PUBLIC_IP}
 MYSQL_ROOT_PASSWORD=${mysql_root_password}
 MYSQL_DATABASE=${mysql_database}
 MYSQL_USER=${mysql_user}
@@ -129,5 +132,5 @@ EOF
 chmod +x /home/opc/setup-ssl.sh
 
 echo "Flarum setup completed!"
-echo "Access your forum at: http://${flarum_public_ip}"
+echo "Access your forum at: http://${ACTUAL_PUBLIC_IP}"
 echo "To setup SSL, run: /home/opc/setup-ssl.sh"
