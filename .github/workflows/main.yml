@@ -50,7 +50,15 @@ jobs:
 
       - name: Configure OCI CLI
         run: |
-          oci setup config --region ${{ secrets.OCI_REGION }} --tenancy-id ${{ secrets.OCI_TENANCY_OCID }} --user-id ${{ secrets.OCI_USER_OCID }} --fingerprint ${{ secrets.OCI_FINGERPRINT }} --key-file ~/.oci/oci_api_key.pem
+          mkdir -p ~/.oci
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          user=${{ secrets.OCI_USER_OCID }}
+          fingerprint=${{ secrets.OCI_FINGERPRINT }}
+          key_file=~/.oci/oci_api_key.pem
+          tenancy=${{ secrets.OCI_TENANCY_OCID }}
+          region=${{ secrets.OCI_REGION }}
+          EOF
         env:
           OCI_CLI_AUTH: api_key
 
