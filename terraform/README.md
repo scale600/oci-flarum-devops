@@ -1,8 +1,8 @@
 # Terraform Infrastructure for Flarum Community
 
-이 디렉토리는 OCI Always Free Tier에 Flarum 커뮤니티 사이트를 배포하기 위한 Terraform 인프라 코드를 포함합니다.
+This directory contains Terraform infrastructure code for deploying a Flarum community site on OCI Always Free Tier.
 
-## 🏗️ 아키텍처
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -21,147 +21,138 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 📁 파일 구조
+## 📁 File Structure
 
-- `main.tf` - 메인 인프라 리소스 정의
-- `variables.tf` - 입력 변수 정의
-- `outputs.tf` - 출력 값 정의
-- `terraform.tfvars.example` - 변수 값 예시 파일
-- `user_data.sh` - Flarum 웹서버 초기화 스크립트
-- `mysql_user_data.sh` - MySQL 데이터베이스 초기화 스크립트
+- `main.tf` - Main infrastructure resource definitions
+- `variables.tf` - Input variable definitions
+- `outputs.tf` - Output value definitions
+- `terraform.tfvars.example` - Variable value example file
+- `user_data.sh` - Flarum web server initialization script
+- `mysql_user_data.sh` - MySQL database initialization script
 
-## 🚀 사용 방법
+## 🚀 Usage
 
-### 1. 사전 준비
+### 1. Prerequisites
 
-1. **OCI 계정 설정**
+1. **OCI Account Setup**
+   - Create and login to OCI account
+   - Generate and download API key
+   - Create Compartment
 
-   - OCI 계정 생성 및 로그인
-   - API 키 생성 및 다운로드
-   - Compartment 생성
-
-2. **SSH 키 생성**
+2. **SSH Key Generation**
    ```bash
    ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
    ```
 
-### 2. 변수 설정
+### 2. Variable Configuration
 
 ```bash
-# terraform.tfvars.example을 복사하여 실제 값으로 수정
+# Copy terraform.tfvars.example and modify with actual values
 cp terraform.tfvars.example terraform.tfvars
 
-# terraform.tfvars 파일을 편집하여 실제 값 입력
+# Edit terraform.tfvars file with actual values
 vim terraform.tfvars
 ```
 
-### 3. Terraform 실행
+### 3. Terraform Execution
 
 ```bash
-# Terraform 초기화
+# Initialize Terraform
 terraform init
 
-# 실행 계획 확인
+# Check execution plan
 terraform plan
 
-# 인프라 배포
+# Deploy infrastructure
 terraform apply
 
-# 배포 확인
+# Verify deployment
 terraform output
 ```
 
-### 4. 접속 및 설정
+### 4. Access and Configuration
 
-1. **Flarum 접속**
-
+1. **Access Flarum**
    ```bash
-   # 출력된 URL로 접속
+   # Access using the output URL
    http://<flarum_public_ip>
    ```
 
-2. **SSH 접속**
+2. **SSH Access**
    ```bash
    ssh opc@<flarum_public_ip>
    ```
 
-## 🔧 주요 리소스
+## 🔧 Key Resources
 
 ### Compute Instances
-
 - **Flarum Web Server**: VM.Standard.A1.Flex (2 OCPU, 12GB RAM)
 - **MySQL Database**: VM.Standard.A1.Flex (1 OCPU, 6GB RAM)
 
 ### Network
-
 - **VCN**: 10.0.0.0/16
-- **Public Subnet**: 10.0.1.0/24 (Flarum 웹서버)
-- **Private Subnet**: 10.0.2.0/24 (MySQL 데이터베이스)
+- **Public Subnet**: 10.0.1.0/24 (Flarum web server)
+- **Private Subnet**: 10.0.2.0/24 (MySQL database)
 
 ### Security
-
 - **Security Lists**: HTTP(80), HTTPS(443), SSH(22), MySQL(3306)
-- **Route Tables**: 인터넷 게이트웨이 연결
+- **Route Tables**: Internet gateway connection
 
-## 🔐 보안 고려사항
+## 🔐 Security Considerations
 
-1. **네트워크 분리**: 웹서버는 공용 서브넷, 데이터베이스는 프라이빗 서브넷
-2. **방화벽**: 필요한 포트만 개방
-3. **SSL/TLS**: Let's Encrypt 인증서 자동 설정
-4. **데이터베이스 보안**: 프라이빗 네트워크에서만 접근 가능
+1. **Network Isolation**: Web server in public subnet, database in private subnet
+2. **Firewall**: Only necessary ports open
+3. **SSL/TLS**: Automatic Let's Encrypt certificate setup
+4. **Database Security**: Access only from private network
 
-## 📊 비용
+## 📊 Cost
 
-- **Always Free Tier** 사용으로 **무료**
-- VM.Standard.A1.Flex 인스턴스 2개 (총 3 OCPU, 18GB RAM)
-- VCN, 서브넷, 인터넷 게이트웨이 등 네트워크 리소스
+- **Free** using Always Free Tier
+- 2 VM.Standard.A1.Flex instances (total 3 OCPU, 18GB RAM)
+- Network resources including VCN, subnets, internet gateway
 
-## 🛠️ 관리 명령어
+## 🛠️ Management Commands
 
 ```bash
-# 인프라 상태 확인
+# Check infrastructure status
 terraform show
 
-# 특정 리소스만 재생성
+# Recreate specific resource only
 terraform apply -replace=oci_core_instance.flarum_instance
 
-# 인프라 삭제
+# Delete infrastructure
 terraform destroy
 
-# 출력 값 확인
+# Check output values
 terraform output flarum_url
 ```
 
-## 🔍 문제 해결
+## 🔍 Troubleshooting
 
-1. **인스턴스 접속 불가**
+1. **Cannot access instance**
+   - Verify SSH key is set correctly
+   - Check security group allows SSH port (22)
 
-   - SSH 키가 올바르게 설정되었는지 확인
-   - 보안 그룹에서 SSH 포트(22) 허용 확인
+2. **Cannot access Flarum**
+   - Verify web server started normally
+   - Check firewall settings
 
-2. **Flarum 접속 불가**
+3. **Database connection error**
+   - Check MySQL service status
+   - Verify network connection
 
-   - 웹서버가 정상적으로 시작되었는지 확인
-   - 방화벽 설정 확인
+## 📝 Additional Configuration
 
-3. **데이터베이스 연결 오류**
-   - MySQL 서비스 상태 확인
-   - 네트워크 연결 확인
-
-## 📝 추가 설정
-
-### SSL 인증서 설정
-
+### SSL Certificate Setup
 ```bash
-# 도메인 설정 후 SSL 인증서 발급
+# Issue SSL certificate after domain setup
 ssh opc@<flarum_public_ip>
 sudo /home/opc/setup-ssl.sh
 ```
 
-### Flarum 확장 프로그램 설치
-
+### Install Flarum Extensions
 ```bash
-# SSH로 접속 후
+# After SSH connection
 cd /home/opc/flarum
 docker-compose exec flarum extension:install <extension-name>
 ```

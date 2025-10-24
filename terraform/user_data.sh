@@ -1,37 +1,37 @@
 #!/bin/bash
 
-# Flarum 웹서버 초기 설정 스크립트
-# Oracle Linux 8 기반
+# Flarum web server initial setup script
+# Based on Oracle Linux 8
 
 set -e
 
-# 로그 설정
+# Logging setup
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 echo "Starting Flarum web server setup..."
 
-# 시스템 업데이트
+# System update
 dnf update -y
 
-# 필요한 패키지 설치
+# Install required packages
 dnf install -y docker docker-compose git curl wget unzip
 
-# Docker 서비스 시작 및 활성화
+# Start and enable Docker service
 systemctl start docker
 systemctl enable docker
 
-# opc 사용자를 docker 그룹에 추가
+# Add opc user to docker group
 usermod -aG docker opc
 
-# Docker Compose 설치 (최신 버전)
+# Install Docker Compose (latest version)
 curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
-# Flarum 디렉토리 생성
+# Create Flarum directory
 mkdir -p /home/opc/flarum
 cd /home/opc/flarum
 
-# Docker Compose 파일 생성
+# Create Docker Compose file
 cat > docker-compose.yml << 'EOF'
 version: '3.8'
 
@@ -84,7 +84,7 @@ networks:
     driver: bridge
 EOF
 
-# 환경 변수 파일 생성
+# Create environment variables file
 cat > .env << EOF
 FLARUM_PUBLIC_IP=${flarum_instance_public_ip}
 MYSQL_ROOT_PASSWORD=${mysql_root_password}
@@ -93,37 +93,37 @@ MYSQL_USER=${mysql_user}
 MYSQL_PASSWORD=${mysql_password}
 EOF
 
-# 소유권 변경
+# Change ownership
 chown -R opc:opc /home/opc/flarum
 
-# Docker Compose로 서비스 시작
+# Start services with Docker Compose
 cd /home/opc/flarum
 docker-compose up -d
 
-# 방화벽 설정 (firewalld 사용)
+# Firewall configuration (using firewalld)
 systemctl start firewalld
 systemctl enable firewalld
 firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --permanent --add-port=443/tcp
 firewall-cmd --reload
 
-# SSL 인증서 설정을 위한 Certbot 설치
+# Install Certbot for SSL certificate setup
 dnf install -y epel-release
 dnf install -y certbot
 
-# Flarum 설정 완료 후 SSL 설정을 위한 스크립트 생성
+# Create script for SSL setup after Flarum configuration
 cat > /home/opc/setup-ssl.sh << 'EOF'
 #!/bin/bash
-# SSL 인증서 설정 스크립트 (도메인 설정 후 실행)
+# SSL certificate setup script (run after domain setup)
 
 DOMAIN_NAME="${domain_name}"
 EMAIL="admin@riderwin.com"
 
-# Certbot으로 SSL 인증서 발급
+# Issue SSL certificate with Certbot
 certbot certonly --standalone -d $DOMAIN_NAME --email $EMAIL --agree-tos --non-interactive
 
-# SSL 인증서를 Docker 컨테이너에서 사용할 수 있도록 설정
-# (추가 설정 필요)
+# Configure SSL certificate for use in Docker containers
+# (additional configuration needed)
 EOF
 
 chmod +x /home/opc/setup-ssl.sh

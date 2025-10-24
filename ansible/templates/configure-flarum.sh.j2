@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Flarum 초기 설정 스크립트
+# Flarum initial configuration script
 set -e
 
 echo "Starting Flarum configuration..."
 
-# Flarum이 이미 설정되었는지 확인
+# Check if Flarum is already configured
 if [ -f "/opt/flarum/flarum_configured" ]; then
     echo "Flarum is already configured. Skipping..."
     exit 0
 fi
 
-# Docker 컨테이너가 실행 중인지 확인
+# Check if Docker containers are running
 cd /opt/flarum
 if ! docker-compose ps | grep -q "Up"; then
     echo "Starting Docker containers..."
@@ -19,10 +19,10 @@ if ! docker-compose ps | grep -q "Up"; then
     sleep 30
 fi
 
-# Flarum 설치 및 설정
+# Flarum installation and configuration
 echo "Configuring Flarum..."
 
-# Flarum CLI를 사용한 초기 설정
+# Initial setup using Flarum CLI
 docker-compose exec -T flarum flarum install \
     --title="Riderwin Community" \
     --admin="{{ flarum_admin_username }}" \
@@ -34,19 +34,19 @@ docker-compose exec -T flarum flarum install \
     --dbpass="{{ mysql_password }}" \
     --forum-url="{{ 'https://' + domain_name if domain_name else 'http://' + ansible_default_ipv4.address }}"
 
-# 기본 확장 프로그램 설치
+# Install essential extensions
 echo "Installing essential extensions..."
 
-# SEO 확장
+# SEO extension
 docker-compose exec -T flarum flarum extension:install flarum-seo
 
-# 이미지 업로드 확장
+# Image upload extension
 docker-compose exec -T flarum flarum extension:install flarum-markdown
 
-# 한국어 언어팩 (선택사항)
+# Korean language pack (optional)
 # docker-compose exec -T flarum flarum extension:install flarum-lang-korean
 
-# 설정 완료 마커 생성
+# Create configuration completion marker
 touch /opt/flarum/flarum_configured
 
 echo "Flarum configuration completed!"
