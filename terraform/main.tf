@@ -167,12 +167,12 @@ resource "oci_core_instance" "flarum_instance" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   display_name        = "flarum-web-server"
-  shape               = "VM.Standard.A1.Flex"
+  shape               = "VM.Standard.E2.1.Micro"
   
   # Always Free Tier 스펙
   shape_config {
-    ocpus         = 2
-    memory_in_gbs = 12
+    ocpus         = 1
+    memory_in_gbs = 1
   }
 
   source_details {
@@ -209,12 +209,12 @@ resource "oci_core_instance" "mysql_instance" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   display_name        = "flarum-mysql-db"
-  shape               = "VM.Standard.A1.Flex"
+  shape               = "VM.Standard.E2.1.Micro"
   
   # Always Free Tier 스펙 (더 작은 리소스)
   shape_config {
     ocpus         = 1
-    memory_in_gbs = 6
+    memory_in_gbs = 1
   }
 
   source_details {
