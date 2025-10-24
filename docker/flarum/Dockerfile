@@ -11,15 +11,15 @@ RUN apk add --no-cache \
 RUN mkdir -p /flarum/app/extensions
 
 # 기본 확장 프로그램 설치
-RUN flarum extension:install flarum-seo && \
-    flarum extension:install flarum-markdown && \
-    flarum extension:install flarum-tags && \
-    flarum extension:install flarum-sticky && \
-    flarum extension:install flarum-subscriptions && \
-    flarum extension:install flarum-mentions && \
-    flarum extension:install flarum-approval && \
-    flarum extension:install flarum-suspend && \
-    flarum extension:install flarum-lock
+RUN php /flarum/app/flarum extension:install flarum-seo && \
+    php /flarum/app/flarum extension:install flarum-markdown && \
+    php /flarum/app/flarum extension:install flarum-tags && \
+    php /flarum/app/flarum extension:install flarum-sticky && \
+    php /flarum/app/flarum extension:install flarum-subscriptions && \
+    php /flarum/app/flarum extension:install flarum-mentions && \
+    php /flarum/app/flarum extension:install flarum-approval && \
+    php /flarum/app/flarum extension:install flarum-suspend && \
+    php /flarum/app/flarum extension:install flarum-lock
 
 # 한국어 언어팩 설치 (선택사항)
 # RUN flarum extension:install flarum-lang-korean
