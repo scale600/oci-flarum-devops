@@ -7,6 +7,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 ### 1. OCI (Oracle Cloud Infrastructure) Authentication Information
 
 #### `OCI_TENANCY_OCID`
+
 - **Description**: OCI Tenancy OCID
 - **Format**: `ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 - **Setup Method**:
@@ -14,6 +15,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
   2. Copy Tenancy OCID
 
 #### `OCI_USER_OCID`
+
 - **Description**: OCI User OCID
 - **Format**: `ocid1.user.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 - **Setup Method**:
@@ -21,6 +23,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
   2. Select user → Copy User OCID
 
 #### `OCI_FINGERPRINT`
+
 - **Description**: API Key Fingerprint
 - **Format**: `xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx`
 - **Setup Method**:
@@ -30,8 +33,9 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
   4. Copy Fingerprint
 
 #### `OCI_PRIVATE_KEY`
+
 - **Description**: API Key Private Key (PEM format)
-- **Format**: 
+- **Format**:
   ```
   -----BEGIN PRIVATE KEY-----
   MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...
@@ -41,6 +45,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
   1. Copy entire content of `.pem` file downloaded when creating API Key
 
 #### `OCI_REGION`
+
 - **Description**: OCI Region
 - **Example**: `ap-seoul-1`, `us-ashburn-1`
 - **Setup Method**:
@@ -48,6 +53,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
   2. Copy Region Identifier
 
 #### `OCI_COMPARTMENT_OCID`
+
 - **Description**: Compartment OCID
 - **Format**: `ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 - **Setup Method**:
@@ -57,6 +63,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 ### 2. SSH Key Information
 
 #### `SSH_PUBLIC_KEY`
+
 - **Description**: SSH Public Key
 - **Format**: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... user@hostname`
 - **Generation Method**:
@@ -66,8 +73,9 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
   ```
 
 #### `SSH_PRIVATE_KEY`
+
 - **Description**: SSH Private Key
-- **Format**: 
+- **Format**:
   ```
   -----BEGIN OPENSSH PRIVATE KEY-----
   b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn...
@@ -81,38 +89,44 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 ### 3. Database Configuration
 
 #### `MYSQL_ROOT_PASSWORD`
+
 - **Description**: MySQL root user password
 - **Format**: Strong password (minimum 12 characters, including special characters)
 - **Example**: `MySecureRootPass123!`
 
 #### `MYSQL_PASSWORD`
-- **Description**: Application database user password
+
+- **Description**: Flarum database user password
 - **Format**: Strong password (minimum 12 characters, including special characters)
 - **Example**: `AppSecurePass456!`
 
-### 4. Application Administrator Configuration
+### 4. Flarum Administrator Configuration
 
-#### `APP_ADMIN_EMAIL`
-- **Description**: Application administrator email
+#### `FLARUM_ADMIN_EMAIL`
+
+- **Description**: Flarum administrator email
 - **Format**: Valid email address
 - **Example**: `admin@example.com`
 
-#### `APP_ADMIN_PASSWORD`
-- **Description**: Application administrator password
+#### `FLARUM_ADMIN_PASSWORD`
+
+- **Description**: Flarum administrator password
 - **Format**: Strong password (minimum 12 characters, including special characters)
 - **Example**: `AdminSecurePass789!`
 
 ### 5. Domain Configuration (Optional)
 
 #### `DOMAIN_NAME`
-- **Description**: Application domain (optional)
+
+- **Description**: Flarum forum domain (optional)
 - **Format**: Valid domain name
-- **Example**: `app.example.com`
+- **Example**: `community.example.com`
 - **Note**: Leave empty to access via IP address
 
 ### 6. Notification Configuration (Optional)
 
 #### `SLACK_WEBHOOK_URL`
+
 - **Description**: Slack webhook URL (for deployment notifications)
 - **Format**: `https://hooks.slack.com/services/[TEAM_ID]/[BOT_ID]/[TOKEN]` (example)
 - **Setup Method**:
@@ -124,12 +138,15 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 ### 1. Setting up Secrets in GitHub Repository
 
 1. **Access GitHub Repository**
+
    - Go to your repository settings
 
 2. **Click Settings Tab**
+
    - Click Settings from the repository top menu
 
 3. **Click Secrets and variables → Actions**
+
    - From the left menu, select Secrets and variables
    - Select Actions
 
@@ -139,6 +156,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 ### 2. Required Secrets Priority
 
 #### 🔴 **Highest Priority (Required)**
+
 1. `OCI_TENANCY_OCID`
 2. `OCI_USER_OCID`
 3. `OCI_FINGERPRINT`
@@ -147,6 +165,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 6. `OCI_COMPARTMENT_OCID`
 
 #### 🟡 **Important (Recommended)**
+
 7. `SSH_PUBLIC_KEY`
 8. `SSH_PRIVATE_KEY`
 9. `MYSQL_ROOT_PASSWORD`
@@ -155,23 +174,28 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 12. `APP_ADMIN_PASSWORD`
 
 #### 🟢 **Optional**
+
 13. `DOMAIN_NAME`
 14. `SLACK_WEBHOOK_URL`
 
 ## ✅ Secrets Setup Verification
 
 ### 1. Setup Completion Check
+
 ```bash
 # Check with GitHub CLI (optional)
 gh secret list
 ```
 
 ### 2. Workflow Testing
+
 1. **Terraform Deployment Test**
+
    - Push changes to `terraform/` directory
    - Check `Terraform Infrastructure Deployment` execution in Actions tab
 
 2. **Ansible Deployment Test**
+
    - Push changes to `ansible/` directory
    - Check `Ansible Configuration Deployment` execution in Actions tab
 
@@ -182,10 +206,12 @@ gh secret list
 ## 🔒 Security Considerations
 
 1. **Prevent Secrets Exposure**
+
    - Never hardcode secrets in code
    - Be careful not to output secrets in logs
 
 2. **Regular Secrets Renewal**
+
    - Renew API keys every 3-6 months
    - Change passwords every 6-12 months
 
@@ -196,33 +222,43 @@ gh secret list
 ## 🆘 Troubleshooting
 
 ### 1. OCI Authentication Error
+
 ```
 Error: Authentication failed
 ```
+
 **Solution**:
+
 - Verify OCI authentication information is correct
 - Check if API Key is activated
 - Verify region is correct
 
 ### 2. SSH Connection Error
+
 ```
 Error: Permission denied (publickey)
 ```
+
 **Solution**:
+
 - Verify SSH keys are set correctly
 - Check if public key is registered in OCI instance
 
 ### 3. Database Connection Error
+
 ```
 Error: Access denied for user
 ```
+
 **Solution**:
+
 - Verify MySQL password is correct
 - Check database user permissions
 
 ## 📞 Support
 
 If problems persist, check the following:
+
 1. GitHub Actions logs
 2. OCI Console resource status
 3. SSH connection test

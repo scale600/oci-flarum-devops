@@ -2,23 +2,23 @@ name: Complete CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy'
+        description: "Environment to deploy"
         required: true
-        default: 'production'
+        default: "production"
         type: choice
         options:
-        - production
-        - staging
+          - production
+          - staging
 
 env:
-  TF_VERSION: '1.6.0'
-  ANSIBLE_VERSION: '7.0.0'
+  TF_VERSION: "1.6.0"
+  ANSIBLE_VERSION: "7.0.0"
 
 jobs:
   # Step 1: Terraform Infrastructure Deployment
@@ -31,89 +31,89 @@ jobs:
     defaults:
       run:
         working-directory: ./terraform
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ env.TF_VERSION }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
 
-    - name: Setup OCI CLI
-      run: |
-        bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults
-        echo "$HOME/bin" >> $GITHUB_PATH
+      - name: Setup OCI CLI
+        run: |
+          bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults
+          echo "$HOME/bin" >> $GITHUB_PATH
 
-    - name: Configure OCI CLI
-      run: |
-        oci setup config --token-version 2.0.0 --region ${{ secrets.OCI_REGION }} --tenancy-id ${{ secrets.OCI_TENANCY_OCID }} --user-id ${{ secrets.OCI_USER_OCID }} --fingerprint ${{ secrets.OCI_FINGERPRINT }} --key-file ~/.oci/oci_api_key.pem
-      env:
-        OCI_CLI_AUTH: api_key
+      - name: Configure OCI CLI
+        run: |
+          oci setup config --token-version 2.0.0 --region ${{ secrets.OCI_REGION }} --tenancy-id ${{ secrets.OCI_TENANCY_OCID }} --user-id ${{ secrets.OCI_USER_OCID }} --fingerprint ${{ secrets.OCI_FINGERPRINT }} --key-file ~/.oci/oci_api_key.pem
+        env:
+          OCI_CLI_AUTH: api_key
 
-    - name: Create OCI API Key file
-      run: |
-        mkdir -p ~/.oci
-        echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
-        chmod 600 ~/.oci/oci_api_key.pem
+      - name: Create OCI API Key file
+        run: |
+          mkdir -p ~/.oci
+          echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Terraform Plan
-      run: terraform plan -var-file="terraform.tfvars" -out=tfplan
-      env:
-        TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
-        TF_VAR_user_ocid: ${{ secrets.OCI_USER_OCID }}
-        TF_VAR_fingerprint: ${{ secrets.OCI_FINGERPRINT }}
-        TF_VAR_private_key_path: "~/.oci/oci_api_key.pem"
-        TF_VAR_region: ${{ secrets.OCI_REGION }}
-        TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_OCID }}
-        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-        TF_VAR_mysql_database: "flarum"
-        TF_VAR_mysql_user: "flarum"
-        TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
-        TF_VAR_app_admin_email: ${{ secrets.APP_ADMIN_EMAIL }}
-        TF_VAR_app_admin_username: "admin"
-        TF_VAR_app_admin_password: ${{ secrets.APP_ADMIN_PASSWORD }}
-        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+      - name: Terraform Plan
+        run: terraform plan -var-file="terraform.tfvars" -out=tfplan
+        env:
+          TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
+          TF_VAR_user_ocid: ${{ secrets.OCI_USER_OCID }}
+          TF_VAR_fingerprint: ${{ secrets.OCI_FINGERPRINT }}
+          TF_VAR_private_key_path: "~/.oci/oci_api_key.pem"
+          TF_VAR_region: ${{ secrets.OCI_REGION }}
+          TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_OCID }}
+          TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          TF_VAR_mysql_database: "flarum"
+          TF_VAR_mysql_user: "flarum"
+          TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
+        TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
+        TF_VAR_flarum_admin_username: "admin"
+        TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
+          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve tfplan
-      env:
-        TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
-        TF_VAR_user_ocid: ${{ secrets.OCI_USER_OCID }}
-        TF_VAR_fingerprint: ${{ secrets.OCI_FINGERPRINT }}
-        TF_VAR_private_key_path: "~/.oci/oci_api_key.pem"
-        TF_VAR_region: ${{ secrets.OCI_REGION }}
-        TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_OCID }}
-        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-        TF_VAR_mysql_database: "flarum"
-        TF_VAR_mysql_user: "flarum"
-        TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
-        TF_VAR_app_admin_email: ${{ secrets.APP_ADMIN_EMAIL }}
-        TF_VAR_app_admin_username: "admin"
-        TF_VAR_app_admin_password: ${{ secrets.APP_ADMIN_PASSWORD }}
-        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve tfplan
+        env:
+          TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
+          TF_VAR_user_ocid: ${{ secrets.OCI_USER_OCID }}
+          TF_VAR_fingerprint: ${{ secrets.OCI_FINGERPRINT }}
+          TF_VAR_private_key_path: "~/.oci/oci_api_key.pem"
+          TF_VAR_region: ${{ secrets.OCI_REGION }}
+          TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_OCID }}
+          TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          TF_VAR_mysql_database: "flarum"
+          TF_VAR_mysql_user: "flarum"
+          TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
+        TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
+        TF_VAR_flarum_admin_username: "admin"
+        TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
+          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
-    - name: Get Terraform Outputs
-      id: terraform-output
-      run: |
-        WEB_IP=$(terraform output -raw web_instance_public_ip)
-        MYSQL_IP=$(terraform output -raw mysql_instance_private_ip)
-        echo "web_ip=$WEB_IP" >> $GITHUB_OUTPUT
-        echo "mysql_ip=$MYSQL_IP" >> $GITHUB_OUTPUT
-        echo "Web Server IP: $WEB_IP"
-        echo "MySQL IP: $MYSQL_IP"
+      - name: Get Terraform Outputs
+        id: terraform-output
+        run: |
+          WEB_IP=$(terraform output -raw web_instance_public_ip)
+          MYSQL_IP=$(terraform output -raw mysql_instance_private_ip)
+          echo "web_ip=$WEB_IP" >> $GITHUB_OUTPUT
+          echo "mysql_ip=$MYSQL_IP" >> $GITHUB_OUTPUT
+          echo "Web Server IP: $WEB_IP"
+          echo "MySQL IP: $MYSQL_IP"
 
-    - name: Wait for instances to be ready
-      run: |
-        echo "Waiting for instances to initialize..."
-        sleep 300  # 5 minute wait
+      - name: Wait for instances to be ready
+        run: |
+          echo "Waiting for instances to initialize..."
+          sleep 300  # 5 minute wait
 
   # Step 2: Ansible Configuration Deployment
   ansible-deploy:
@@ -124,54 +124,54 @@ jobs:
     defaults:
       run:
         working-directory: ./ansible
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-    - name: Install Ansible
-      run: |
-        pip install ansible==${{ env.ANSIBLE_VERSION }}
-        ansible --version
+      - name: Install Ansible
+        run: |
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+          ansible --version
 
-    - name: Create SSH key file
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+      - name: Create SSH key file
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
 
-    - name: Add host to known_hosts
-      run: |
-        ssh-keyscan -H ${{ needs.terraform-deploy.outputs.flarum_ip }} >> ~/.ssh/known_hosts
+      - name: Add host to known_hosts
+        run: |
+          ssh-keyscan -H ${{ needs.terraform-deploy.outputs.web_ip }} >> ~/.ssh/known_hosts
 
-    - name: Create inventory file
-      run: |
-        cat > inventory.ini << EOF
-        [flarum_servers]
-        ${{ needs.terraform-deploy.outputs.flarum_ip }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
-        EOF
+      - name: Create inventory file
+        run: |
+          cat > inventory.ini << EOF
+          [flarum_servers]
+          ${{ needs.terraform-deploy.outputs.web_ip }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
+          EOF
 
-    - name: Test connection
-      run: |
-        ansible all -i inventory.ini -m ping
+      - name: Test connection
+        run: |
+          ansible all -i inventory.ini -m ping
 
-    - name: Run Ansible playbook
-      run: |
-        ansible-playbook -i inventory.ini playbook.yml -v
-      env:
-        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-        MYSQL_DATABASE: "flarum"
-        MYSQL_USER: "flarum"
-        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        APP_ADMIN_EMAIL: ${{ secrets.APP_ADMIN_EMAIL }}
-        APP_ADMIN_USERNAME: "admin"
-        APP_ADMIN_PASSWORD: ${{ secrets.APP_ADMIN_PASSWORD }}
+      - name: Run Ansible playbook
+        run: |
+          ansible-playbook -i inventory.ini playbook.yml -v
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: "flarum"
+          MYSQL_USER: "flarum"
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        FLARUM_ADMIN_EMAIL: ${{ secrets.FLARUM_ADMIN_EMAIL }}
+        FLARUM_ADMIN_USERNAME: "admin"
+        FLARUM_ADMIN_PASSWORD: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
         DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
 
   # Step 3: Docker Image Build and Deployment
@@ -183,49 +183,49 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ghcr.io/${{ github.repository }}
-        tags: |
-          type=ref,event=branch
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
 
-    - name: Build and push Flarum image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./docker/flarum
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      - name: Build and push Flarum image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker/flarum
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-    - name: Build and push MySQL image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./docker/mysql
-        push: true
-        tags: ghcr.io/${{ github.repository }}-mysql:${{ github.sha }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      - name: Build and push MySQL image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker/mysql
+          push: true
+          tags: ghcr.io/${{ github.repository }}-mysql:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   # Step 4: Security Scan
   security-scan:
@@ -233,23 +233,23 @@ jobs:
     needs: docker-deploy
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          format: "sarif"
+          output: "trivy-results.sarif"
 
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
 
   # Step 5: Final Deployment and Verification
   final-deploy:
@@ -258,66 +258,66 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Deploy with Ansible
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ needs.terraform-deploy.outputs.web_ip }}
-        username: opc
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /opt/application
-          docker-compose pull
-          docker-compose up -d
-          docker-compose ps
+      - name: Deploy with Ansible
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ needs.terraform-deploy.outputs.web_ip }}
+          username: opc
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/flarum
+            docker-compose pull
+            docker-compose up -d
+            docker-compose ps
 
-    - name: Health Check
-      run: |
-        echo "Performing health checks..."
-        sleep 30
-        
-        # HTTP response check
-        curl -f http://${{ needs.terraform-deploy.outputs.web_ip }} || exit 1
-        
-        # Check Docker container status
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa opc@${{ needs.terraform-deploy.outputs.web_ip }} "docker ps"
+      - name: Health Check
+        run: |
+          echo "Performing health checks..."
+          sleep 30
 
-    - name: Create deployment summary
-      run: |
-        echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📊 Infrastructure" >> $GITHUB_STEP_SUMMARY
-        echo "- **Application URL**: http://${{ needs.terraform-deploy.outputs.web_ip }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Web Server IP**: ${{ needs.terraform-deploy.outputs.web_ip }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Database IP**: ${{ needs.terraform-deploy.outputs.mysql_ip }}" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🔗 Access Information" >> $GITHUB_STEP_SUMMARY
-        echo "- **SSH Command**: \`ssh opc@${{ needs.terraform-deploy.outputs.web_ip }}\`" >> $GITHUB_STEP_SUMMARY
-        echo "- **Application URL**: http://${{ needs.terraform-deploy.outputs.web_ip }}" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### ⚠️ Next Steps" >> $GITHUB_STEP_SUMMARY
-        echo "1. Wait for instances to fully initialize (5-10 minutes)" >> $GITHUB_STEP_SUMMARY
-        echo "2. Access the application URL to complete setup" >> $GITHUB_STEP_SUMMARY
-        echo "3. Configure SSL certificate if domain is set up" >> $GITHUB_STEP_SUMMARY
+          # HTTP response check
+          curl -f http://${{ needs.terraform-deploy.outputs.web_ip }} || exit 1
 
-    - name: Notify deployment success
-      if: success()
-      uses: 8398a7/action-slack@v3
-      with:
-        status: success
-        text: "🚀 Application deployment successful! Access: http://${{ needs.terraform-deploy.outputs.web_ip }}"
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          # Check Docker container status
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa opc@${{ needs.terraform-deploy.outputs.web_ip }} "docker ps"
 
-    - name: Notify deployment failure
-      if: failure()
-      uses: 8398a7/action-slack@v3
-      with:
-        status: failure
-        text: "❌ Application deployment failed!"
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Infrastructure" >> $GITHUB_STEP_SUMMARY
+          echo "- **Application URL**: http://${{ needs.terraform-deploy.outputs.web_ip }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Web Server IP**: ${{ needs.terraform-deploy.outputs.web_ip }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Database IP**: ${{ needs.terraform-deploy.outputs.mysql_ip }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Access Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **SSH Command**: \`ssh opc@${{ needs.terraform-deploy.outputs.web_ip }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Application URL**: http://${{ needs.terraform-deploy.outputs.web_ip }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚠️ Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Wait for instances to fully initialize (5-10 minutes)" >> $GITHUB_STEP_SUMMARY
+          echo "2. Access the application URL to complete setup" >> $GITHUB_STEP_SUMMARY
+          echo "3. Configure SSL certificate if domain is set up" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify deployment success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: "🚀 Application deployment successful! Access: http://${{ needs.terraform-deploy.outputs.web_ip }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify deployment failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: "❌ Application deployment failed!"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
