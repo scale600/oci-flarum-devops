@@ -1,6 +1,6 @@
-# Terraform Infrastructure for Flarum Community
+# Terraform Infrastructure for Web Application
 
-This directory contains Terraform infrastructure code for deploying a Flarum community site on OCI Always Free Tier.
+This directory contains Terraform infrastructure code for deploying a web application on OCI Always Free Tier.
 
 ## 🏗️ Architecture
 
@@ -12,7 +12,7 @@ This directory contains Terraform infrastructure code for deploying a Flarum com
 │  │   Public Subnet │    │      Private Subnet            │  │
 │  │                 │    │                                 │  │
 │  │  ┌─────────────┐│    │  ┌─────────────────────────┐  │  │
-│  │  │ Flarum Web  ││    │  │    MySQL Database       │  │  │
+│  │  │ Web Server  ││    │  │    MySQL Database       │  │  │
 │  │  │   Server    ││◄───┤  │      Server              │  │  │
 │  │  │ (2 OCPU)    ││    │  │    (1 OCPU)             │  │  │
 │  │  │ 12GB RAM    ││    │  │    6GB RAM               │  │  │
@@ -27,7 +27,7 @@ This directory contains Terraform infrastructure code for deploying a Flarum com
 - `variables.tf` - Input variable definitions
 - `outputs.tf` - Output value definitions
 - `terraform.tfvars.example` - Variable value example file
-- `user_data.sh` - Flarum web server initialization script
+- `user_data.sh` - Web server initialization script
 - `mysql_user_data.sh` - MySQL database initialization script
 
 ## 🚀 Usage
@@ -72,26 +72,26 @@ terraform output
 
 ### 4. Access and Configuration
 
-1. **Access Flarum**
+1. **Access Application**
    ```bash
    # Access using the output URL
-   http://<flarum_public_ip>
+   http://<web_server_public_ip>
    ```
 
 2. **SSH Access**
    ```bash
-   ssh opc@<flarum_public_ip>
+   ssh opc@<web_server_public_ip>
    ```
 
 ## 🔧 Key Resources
 
 ### Compute Instances
-- **Flarum Web Server**: VM.Standard.A1.Flex (2 OCPU, 12GB RAM)
+- **Web Server**: VM.Standard.A1.Flex (2 OCPU, 12GB RAM)
 - **MySQL Database**: VM.Standard.A1.Flex (1 OCPU, 6GB RAM)
 
 ### Network
 - **VCN**: 10.0.0.0/16
-- **Public Subnet**: 10.0.1.0/24 (Flarum web server)
+- **Public Subnet**: 10.0.1.0/24 (Web server)
 - **Private Subnet**: 10.0.2.0/24 (MySQL database)
 
 ### Security
@@ -118,13 +118,13 @@ terraform output
 terraform show
 
 # Recreate specific resource only
-terraform apply -replace=oci_core_instance.flarum_instance
+terraform apply -replace=oci_core_instance.web_instance
 
 # Delete infrastructure
 terraform destroy
 
 # Check output values
-terraform output flarum_url
+terraform output web_url
 ```
 
 ## 🔍 Troubleshooting
@@ -133,7 +133,7 @@ terraform output flarum_url
    - Verify SSH key is set correctly
    - Check security group allows SSH port (22)
 
-2. **Cannot access Flarum**
+2. **Cannot access application**
    - Verify web server started normally
    - Check firewall settings
 
@@ -146,13 +146,25 @@ terraform output flarum_url
 ### SSL Certificate Setup
 ```bash
 # Issue SSL certificate after domain setup
-ssh opc@<flarum_public_ip>
+ssh opc@<web_server_public_ip>
 sudo /home/opc/setup-ssl.sh
 ```
 
-### Install Flarum Extensions
+### Application Configuration
 ```bash
 # After SSH connection
-cd /home/opc/flarum
-docker-compose exec flarum extension:install <extension-name>
+cd /home/opc/application
+docker-compose exec app <configuration-command>
 ```
+
+## 🎯 Learning Objectives
+
+This infrastructure setup demonstrates:
+
+1. **Infrastructure as Code (IaC)** with Terraform
+2. **Cloud Architecture** with public/private subnet separation
+3. **Security Best Practices** with network isolation
+4. **Cost Optimization** using Always Free Tier
+5. **Automated Deployment** with user data scripts
+6. **Database Management** with MySQL configuration
+7. **SSL/TLS Setup** with Let's Encrypt automation
