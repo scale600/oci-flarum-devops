@@ -503,3 +503,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Start by setting up your GitHub Secrets and pushing to the main branch. The entire infrastructure will be deployed automatically!
 # Trigger deployment
 # Retry deployment with updated compartment OCID
+# 재배포 트리거 - Fri Oct 24 15:36:11 PDT 2025
