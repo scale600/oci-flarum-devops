@@ -1,6 +1,6 @@
-# Terraform Infrastructure for Web Application
+# Terraform Infrastructure for Flarum Community
 
-This directory contains Terraform infrastructure code for deploying a web application on OCI Always Free Tier.
+This directory contains Terraform infrastructure code for deploying a Flarum community forum on OCI Always Free Tier.
 
 ## 🏗️ Architecture
 
@@ -12,7 +12,7 @@ This directory contains Terraform infrastructure code for deploying a web applic
 │  │   Public Subnet │    │      Private Subnet            │  │
 │  │                 │    │                                 │  │
 │  │  ┌─────────────┐│    │  ┌─────────────────────────┐  │  │
-│  │  │ Web Server  ││    │  │    MySQL Database       │  │  │
+│  │  │ Flarum Web  ││    │  │    MySQL Database       │  │  │
 │  │  │   Server    ││◄───┤  │      Server              │  │  │
 │  │  │ (2 OCPU)    ││    │  │    (1 OCPU)             │  │  │
 │  │  │ 12GB RAM    ││    │  │    6GB RAM               │  │  │
@@ -27,7 +27,7 @@ This directory contains Terraform infrastructure code for deploying a web applic
 - `variables.tf` - Input variable definitions
 - `outputs.tf` - Output value definitions
 - `terraform.tfvars.example` - Variable value example file
-- `user_data.sh` - Web server initialization script
+- `user_data.sh` - Flarum web server initialization script
 - `mysql_user_data.sh` - MySQL database initialization script
 
 ## 🚀 Usage
@@ -35,6 +35,7 @@ This directory contains Terraform infrastructure code for deploying a web applic
 ### 1. Prerequisites
 
 1. **OCI Account Setup**
+
    - Create and login to OCI account
    - Generate and download API key
    - Create Compartment
@@ -72,35 +73,39 @@ terraform output
 
 ### 4. Access and Configuration
 
-1. **Access Application**
+1. **Access Flarum Forum**
+
    ```bash
    # Access using the output URL
-   http://<web_server_public_ip>
+   http://<flarum_server_public_ip>
    ```
 
 2. **SSH Access**
    ```bash
-   ssh opc@<web_server_public_ip>
+   ssh opc@<flarum_server_public_ip>
    ```
 
 ## 🔧 Key Resources
 
 ### Compute Instances
-- **Web Server**: VM.Standard.A1.Flex (2 OCPU, 12GB RAM)
+
+- **Flarum Web Server**: VM.Standard.A1.Flex (2 OCPU, 12GB RAM)
 - **MySQL Database**: VM.Standard.A1.Flex (1 OCPU, 6GB RAM)
 
 ### Network
+
 - **VCN**: 10.0.0.0/16
-- **Public Subnet**: 10.0.1.0/24 (Web server)
+- **Public Subnet**: 10.0.1.0/24 (Flarum web server)
 - **Private Subnet**: 10.0.2.0/24 (MySQL database)
 
 ### Security
+
 - **Security Lists**: HTTP(80), HTTPS(443), SSH(22), MySQL(3306)
 - **Route Tables**: Internet gateway connection
 
 ## 🔐 Security Considerations
 
-1. **Network Isolation**: Web server in public subnet, database in private subnet
+1. **Network Isolation**: Flarum web server in public subnet, database in private subnet
 2. **Firewall**: Only necessary ports open
 3. **SSL/TLS**: Automatic Let's Encrypt certificate setup
 4. **Database Security**: Access only from private network
@@ -118,22 +123,24 @@ terraform output
 terraform show
 
 # Recreate specific resource only
-terraform apply -replace=oci_core_instance.web_instance
+terraform apply -replace=oci_core_instance.flarum_instance
 
 # Delete infrastructure
 terraform destroy
 
 # Check output values
-terraform output web_url
+terraform output flarum_url
 ```
 
 ## 🔍 Troubleshooting
 
 1. **Cannot access instance**
+
    - Verify SSH key is set correctly
    - Check security group allows SSH port (22)
 
-2. **Cannot access application**
+2. **Cannot access Flarum forum**
+
    - Verify web server started normally
    - Check firewall settings
 
@@ -144,17 +151,19 @@ terraform output web_url
 ## 📝 Additional Configuration
 
 ### SSL Certificate Setup
+
 ```bash
 # Issue SSL certificate after domain setup
-ssh opc@<web_server_public_ip>
+ssh opc@<flarum_server_public_ip>
 sudo /home/opc/setup-ssl.sh
 ```
 
-### Application Configuration
+### Flarum Configuration
+
 ```bash
 # After SSH connection
-cd /home/opc/application
-docker-compose exec app <configuration-command>
+cd /home/opc/flarum
+docker-compose exec flarum <configuration-command>
 ```
 
 ## 🎯 Learning Objectives
