@@ -1,0 +1,159 @@
+---
+- name: Configure Flarum Community Server
+  hosts: flarum_servers
+  become: yes
+  vars:
+    mysql_root_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    mysql_database: "{{ MYSQL_DATABASE | default('flarum') }}"
+    mysql_user: "{{ MYSQL_USER | default('flarum') }}"
+    mysql_password: "{{ MYSQL_PASSWORD }}"
+    flarum_admin_email: "{{ FLARUM_ADMIN_EMAIL }}"
+    flarum_admin_username: "{{ FLARUM_ADMIN_USERNAME | default('admin') }}"
+    flarum_admin_password: "{{ FLARUM_ADMIN_PASSWORD }}"
+    domain_name: "{{ DOMAIN_NAME | default('') }}"
+    flarum_data_dir: "/opt/flarum"
+    docker_compose_version: "2.21.0"
+
+  tasks:
+    - name: Update system packages
+      dnf:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: Install required packages
+      dnf:
+        name:
+          - docker
+          - docker-compose
+          - git
+          - curl
+          - wget
+          - unzip
+          - firewalld
+          - certbot
+          - python3-certbot-dns-cloudflare
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Start and enable firewalld
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Add opc user to docker group
+      user:
+        name: opc
+        groups: docker
+        append: yes
+
+    - name: Create Flarum data directory
+      file:
+        path: "{{ flarum_data_dir }}"
+        state: directory
+        owner: opc
+        group: opc
+        mode: '0755'
+
+    - name: Create Docker Compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: "{{ flarum_data_dir }}/docker-compose.yml"
+        owner: opc
+        group: opc
+        mode: '0644'
+
+    - name: Create environment file
+      template:
+        src: .env.j2
+        dest: "{{ flarum_data_dir }}/.env"
+        owner: opc
+        group: opc
+        mode: '0600'
+
+    - name: Create Flarum configuration script
+      template:
+        src: configure-flarum.sh.j2
+        dest: "{{ flarum_data_dir }}/configure-flarum.sh"
+        owner: opc
+        group: opc
+        mode: '0755'
+
+    - name: Create SSL setup script
+      template:
+        src: setup-ssl.sh.j2
+        dest: "{{ flarum_data_dir }}/setup-ssl.sh"
+        owner: opc
+        group: opc
+        mode: '0755'
+
+    - name: Configure firewall rules
+      firewalld:
+        port: "{{ item }}"
+        permanent: yes
+        state: enabled
+        immediate: yes
+      loop:
+        - "80/tcp"
+        - "443/tcp"
+        - "22/tcp"
+
+    - name: Start Flarum services
+      shell: |
+        cd {{ flarum_data_dir }}
+        docker-compose up -d
+      become_user: opc
+
+    - name: Wait for services to be ready
+      wait_for:
+        port: 80
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 30
+        timeout: 300
+
+    - name: Configure Flarum (if not already configured)
+      shell: |
+        cd {{ flarum_data_dir }}
+        ./configure-flarum.sh
+      become_user: opc
+      ignore_errors: yes
+
+    - name: Setup SSL certificate (if domain is provided)
+      shell: |
+        cd {{ flarum_data_dir }}
+        ./setup-ssl.sh
+      become_user: opc
+      when: domain_name != ""
+      ignore_errors: yes
+
+    - name: Create health check script
+      template:
+        src: health-check.sh.j2
+        dest: "{{ flarum_data_dir }}/health-check.sh"
+        owner: opc
+        group: opc
+        mode: '0755'
+
+    - name: Create systemd service for health monitoring
+      template:
+        src: flarum-health.service.j2
+        dest: /etc/systemd/system/flarum-health.service
+      notify: reload systemd
+
+    - name: Start and enable health monitoring service
+      systemd:
+        name: flarum-health
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+  handlers:
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes

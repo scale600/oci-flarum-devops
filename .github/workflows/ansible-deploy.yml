@@ -1,0 +1,147 @@
+name: Ansible Configuration Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'ansible/**' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'ansible/**' ]
+  workflow_dispatch:
+    inputs:
+      target_host:
+        description: 'Target host IP address'
+        required: true
+        type: string
+
+env:
+  ANSIBLE_VERSION: '7.0.0'
+
+jobs:
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./ansible
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Ansible and dependencies
+      run: |
+        pip install ansible==${{ env.ANSIBLE_VERSION }} ansible-lint yamllint
+        ansible --version
+        ansible-lint --version
+
+    - name: Run ansible-lint
+      run: ansible-lint playbook.yml
+
+    - name: Run yamllint
+      run: yamllint .
+
+  ansible-deploy:
+    name: Ansible Deploy
+    needs: ansible-lint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: ./ansible
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Ansible
+      run: |
+        pip install ansible==${{ env.ANSIBLE_VERSION }}
+        ansible --version
+
+    - name: Create SSH key file
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+
+    - name: Add host to known_hosts
+      run: |
+        ssh-keyscan -H ${{ github.event.inputs.target_host || 'flarum-instance' }} >> ~/.ssh/known_hosts
+
+    - name: Create inventory file
+      run: |
+        cat > inventory.ini << EOF
+        [flarum_servers]
+        ${{ github.event.inputs.target_host || 'flarum-instance' }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
+        EOF
+
+    - name: Test connection
+      run: |
+        ansible all -i inventory.ini -m ping
+
+    - name: Run Ansible playbook
+      run: |
+        ansible-playbook -i inventory.ini playbook.yml -v
+      env:
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        MYSQL_DATABASE: "flarum"
+        MYSQL_USER: "flarum"
+        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        FLARUM_ADMIN_EMAIL: ${{ secrets.FLARUM_ADMIN_EMAIL }}
+        FLARUM_ADMIN_USERNAME: "admin"
+        FLARUM_ADMIN_PASSWORD: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
+        DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+
+    - name: Verify deployment
+      run: |
+        ansible all -i inventory.ini -m shell -a "docker ps"
+        ansible all -i inventory.ini -m shell -a "systemctl status docker"
+
+  ansible-rollback:
+    name: Ansible Rollback
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'rollback'
+    defaults:
+      run:
+        working-directory: ./ansible
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Ansible
+      run: pip install ansible==${{ env.ANSIBLE_VERSION }}
+
+    - name: Create SSH key file
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Create inventory file
+      run: |
+        cat > inventory.ini << EOF
+        [flarum_servers]
+        ${{ github.event.inputs.target_host }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
+        EOF
+
+    - name: Run rollback playbook
+      run: |
+        ansible-playbook -i inventory.ini rollback.yml -v

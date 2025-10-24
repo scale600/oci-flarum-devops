@@ -1,0 +1,249 @@
+name: Terraform Infrastructure Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'terraform/**' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'terraform/**' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  TF_VERSION: '1.6.0'
+  OCI_CLI_VERSION: '3.37.0'
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Setup OCI CLI
+      run: |
+        bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults
+        echo "$HOME/bin" >> $GITHUB_PATH
+
+    - name: Configure OCI CLI
+      run: |
+        oci setup config --token-version 2.0.0 --region ${{ secrets.OCI_REGION }} --tenancy-id ${{ secrets.OCI_TENANCY_OCID }} --user-id ${{ secrets.OCI_USER_OCID }} --fingerprint ${{ secrets.OCI_FINGERPRINT }} --key-file ~/.oci/oci_api_key.pem
+      env:
+        OCI_CLI_AUTH: api_key
+
+    - name: Create OCI API Key file
+      run: |
+        mkdir -p ~/.oci
+        echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
+        chmod 600 ~/.oci/oci_api_key.pem
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan -var-file="terraform.tfvars" -out=tfplan
+      env:
+        TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
+        TF_VAR_user_ocid: ${{ secrets.OCI_USER_OCID }}
+        TF_VAR_fingerprint: ${{ secrets.OCI_FINGERPRINT }}
+        TF_VAR_private_key_path: "~/.oci/oci_api_key.pem"
+        TF_VAR_region: ${{ secrets.OCI_REGION }}
+        TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_OCID }}
+        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        TF_VAR_mysql_database: "flarum"
+        TF_VAR_mysql_user: "flarum"
+        TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
+        TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
+        TF_VAR_flarum_admin_username: "admin"
+        TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
+        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+
+    - name: Upload Terraform Plan
+      uses: actions/upload-artifact@v4
+      with:
+        name: terraform-plan
+        path: terraform/tfplan
+
+  terraform-apply:
+    name: Terraform Apply
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: ./terraform
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Setup OCI CLI
+      run: |
+        bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults
+        echo "$HOME/bin" >> $GITHUB_PATH
+
+    - name: Configure OCI CLI
+      run: |
+        oci setup config --token-version 2.0.0 --region ${{ secrets.OCI_REGION }} --tenancy-id ${{ secrets.OCI_TENANCY_OCID }} --user-id ${{ secrets.OCI_USER_OCID }} --fingerprint ${{ secrets.OCI_FINGERPRINT }} --key-file ~/.oci/oci_api_key.pem
+      env:
+        OCI_CLI_AUTH: api_key
+
+    - name: Create OCI API Key file
+      run: |
+        mkdir -p ~/.oci
+        echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
+        chmod 600 ~/.oci/oci_api_key.pem
+
+    - name: Download Terraform Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: terraform-plan
+        path: terraform/
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+      env:
+        TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
+        TF_VAR_user_ocid: ${{ secrets.OCI_USER_OCID }}
+        TF_VAR_fingerprint: ${{ secrets.OCI_FINGERPRINT }}
+        TF_VAR_private_key_path: "~/.oci/oci_api_key.pem"
+        TF_VAR_region: ${{ secrets.OCI_REGION }}
+        TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_OCID }}
+        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        TF_VAR_mysql_database: "flarum"
+        TF_VAR_mysql_user: "flarum"
+        TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
+        TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
+        TF_VAR_flarum_admin_username: "admin"
+        TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
+        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+
+    - name: Get Terraform Outputs
+      run: |
+        terraform output -json > terraform-outputs.json
+        cat terraform-outputs.json
+
+    - name: Upload Terraform Outputs
+      uses: actions/upload-artifact@v4
+      with:
+        name: terraform-outputs
+        path: terraform/terraform-outputs.json
+
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const outputs = JSON.parse(fs.readFileSync('terraform/terraform-outputs.json', 'utf8'));
+          
+          const comment = `## 🚀 Infrastructure Deployment Results
+          
+          ### 📊 Deployment Summary
+          - **Flarum URL**: ${outputs.flarum_url?.value || 'N/A'}
+          - **Flarum Public IP**: ${outputs.flarum_instance_public_ip?.value || 'N/A'}
+          - **MySQL Private IP**: ${outputs.mysql_instance_private_ip?.value || 'N/A'}
+          
+          ### 🔗 Access Information
+          - **SSH Command**: \`${outputs.ssh_connection_command?.value || 'N/A'}\`
+          - **Forum URL**: ${outputs.flarum_url?.value || 'N/A'}
+          
+          ### ⚠️ Next Steps
+          1. Wait for instances to fully initialize (5-10 minutes)
+          2. Access the forum URL to complete Flarum setup
+          3. Configure SSL certificate if domain is set up`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  terraform-destroy:
+    name: Terraform Destroy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging'
+    defaults:
+      run:
+        working-directory: ./terraform
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Setup OCI CLI
+      run: |
+        bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults
+        echo "$HOME/bin" >> $GITHUB_PATH
+
+    - name: Configure OCI CLI
+      run: |
+        oci setup config --token-version 2.0.0 --region ${{ secrets.OCI_REGION }} --tenancy-id ${{ secrets.OCI_TENANCY_OCID }} --user-id ${{ secrets.OCI_USER_OCID }} --fingerprint ${{ secrets.OCI_FINGERPRINT }} --key-file ~/.oci/oci_api_key.pem
+      env:
+        OCI_CLI_AUTH: api_key
+
+    - name: Create OCI API Key file
+      run: |
+        mkdir -p ~/.oci
+        echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
+        chmod 600 ~/.oci/oci_api_key.pem
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
+      env:
+        TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
+        TF_VAR_user_ocid: ${{ secrets.OCI_USER_OCID }}
+        TF_VAR_fingerprint: ${{ secrets.OCI_FINGERPRINT }}
+        TF_VAR_private_key_path: "~/.oci/oci_api_key.pem"
+        TF_VAR_region: ${{ secrets.OCI_REGION }}
+        TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_OCID }}
+        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        TF_VAR_mysql_database: "flarum"
+        TF_VAR_mysql_user: "flarum"
+        TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
+        TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
+        TF_VAR_flarum_admin_username: "admin"
+        TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
+        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
