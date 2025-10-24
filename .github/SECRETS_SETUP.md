@@ -10,25 +10,30 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 
 - **Description**: OCI Tenancy OCID
 - **Format**: `ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **✅ Your Value**: `ocid1.tenancy.oc1..aaaaaaaav6qj3vtbhomujsttvjepog6q5mb7mcomvds4crpo5nzr7hakdupq`
 - **Detailed Setup Method**:
+
   1. **Login to OCI Console**: Go to [cloud.oracle.com](https://cloud.oracle.com) and sign in
   2. **Navigate to Tenancy Details** (Multiple ways to find it):
-     
+
      **Method 1 - Profile Menu**:
+
      - Click on your **profile icon** (top-right corner)
      - Select **"Tenancy: [Your Tenancy Name]"**
      - This will take you directly to Tenancy Details
-     
+
      **Method 2 - Identity Menu**:
+
      - Click the hamburger menu (☰) in the top-left corner
      - Go to **Identity & Security** → **Domains** (or **Users**)
      - Look for **"Tenancy Details"** link in the left sidebar
-     
+
      **Method 3 - Direct URL**:
+
      - Go directly to: `https://console.region.oraclecloud.com/identity/tenancy`
      - Replace `region` with your region (e.g., `ap-seoul-1`)
-     
-  3. **Copy Tenancy OCID**: 
+
+  3. **Copy Tenancy OCID**:
      - Look for "OCID" field in the Tenancy Information section
      - Click the "Copy" button next to the OCID
      - Format: `ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
@@ -37,17 +42,21 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 
 - **Description**: OCI User OCID
 - **Format**: `ocid1.user.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **✅ Your Value**: `ocid1.user.oc1..aaaaaaaalszqhrun6tj3otseuteyu2ykgvbgyf3rlemfpbf4nbm646kvvmga`
 - **Detailed Setup Method**:
+
   1. **Navigate to Users** (Multiple ways):
-     
+
      **Method 1 - Identity Menu**:
+
      - Click the hamburger menu (☰) in the top-left corner
      - Go to **Identity & Security** → **Users**
-     
+
      **Method 2 - Direct URL**:
+
      - Go directly to: `https://console.region.oraclecloud.com/identity/users`
      - Replace `region` with your region (e.g., `ap-seoul-1`)
-     
+
   2. **Find Your User**:
      - Look for your username in the list (usually your email address)
      - Click on your username to open user details
@@ -60,18 +69,22 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 
 - **Description**: API Key Fingerprint
 - **Format**: `xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx`
+- **✅ Your Value**: `9f:34:a6:0f:05:fb:5e:76:3e:43:e0:ae:5d:49:92:3d`
 - **Detailed Setup Method**:
+
   1. **Navigate to API Keys** (Multiple ways):
-     
+
      **Method 1 - From Users Page**:
+
      - Go to **Identity & Security** → **Users**
      - Click on your username
      - Scroll down to **API Keys** section
-     
+
      **Method 2 - Direct URL**:
+
      - Go directly to: `https://console.region.oraclecloud.com/identity/users/[USER_OCID]/api-keys`
      - Replace `region` with your region and `[USER_OCID]` with your User OCID
-     
+
   2. **Add API Key**:
      - Click **Add API Key** button
      - Select **Generate API Key Pair**
@@ -84,7 +97,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 #### `OCI_PRIVATE_KEY`
 
 - **Description**: API Key Private Key (PEM format)
-- **Format**: 
+- **Format**:
   ```
   -----BEGIN PRIVATE KEY-----
   MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...
@@ -125,17 +138,21 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 
 - **Description**: Compartment OCID
 - **Format**: `ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **✅ Your Value**: `ocid1.tenancy.oc1..aaaaaaaav6qj3vtbhomujsttvjepog6q5mb7mcomvds4crpo5nzr7hakdupq`
 - **Detailed Setup Method**:
+
   1. **Navigate to Compartments** (Multiple ways):
-     
+
      **Method 1 - Identity Menu**:
+
      - Click the hamburger menu (☰) in the top-left corner
      - Go to **Identity & Security** → **Compartments**
-     
+
      **Method 2 - Direct URL**:
+
      - Go directly to: `https://console.region.oraclecloud.com/identity/compartments`
      - Replace `region` with your region (e.g., `ap-seoul-1`)
-     
+
   2. **Find Root Compartment**:
      - Look for the "root" compartment (usually named after your tenancy)
      - If you don't see it, you can use the root compartment
@@ -158,6 +175,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 - **Description**: SSH Public Key
 - **Format**: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... user@hostname`
 - **Detailed Generation Method**:
+
   1. **Open Terminal/Command Prompt**:
      - On Windows: Open PowerShell or Command Prompt
      - On Mac/Linux: Open Terminal
@@ -169,13 +187,15 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
      - Enter a passphrase (optional but recommended)
      - Confirm the passphrase
   3. **Copy Public Key**:
+
      ```bash
      # On Mac/Linux:
      cat ~/.ssh/id_rsa.pub
-     
+
      # On Windows (PowerShell):
      Get-Content ~/.ssh/id_rsa.pub
      ```
+
   4. **Copy the Output**:
      - Copy the entire line starting with `ssh-rsa`
      - Format: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... your-email@example.com`
@@ -183,22 +203,25 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 #### `SSH_PRIVATE_KEY`
 
 - **Description**: SSH Private Key
-- **Format**: 
+- **Format**:
   ```
   -----BEGIN OPENSSH PRIVATE KEY-----
   b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn...
   -----END OPENSSH PRIVATE KEY-----
   ```
 - **Detailed Generation Method**:
+
   1. **Open Terminal/Command Prompt** (same as above)
   2. **Display Private Key**:
+
      ```bash
      # On Mac/Linux:
      cat ~/.ssh/id_rsa
-     
+
      # On Windows (PowerShell):
      Get-Content ~/.ssh/id_rsa
      ```
+
   3. **Copy Entire Private Key**:
      - Copy everything from `-----BEGIN OPENSSH PRIVATE KEY-----` to `-----END OPENSSH PRIVATE KEY-----`
      - Include the BEGIN and END lines
@@ -373,17 +396,20 @@ gh secret list
 **Solutions**:
 
 1. **Try Profile Menu Method**:
+
    - Click on your **profile icon** (top-right corner)
    - Select **"Tenancy: [Your Tenancy Name]"**
    - This should take you directly to Tenancy Details
 
 2. **Use Direct URLs**:
+
    - Tenancy Details: `https://console.region.oraclecloud.com/identity/tenancy`
    - Users: `https://console.region.oraclecloud.com/identity/users`
    - Compartments: `https://console.region.oraclecloud.com/identity/compartments`
    - Replace `region` with your region (e.g., `ap-seoul-1`)
 
 3. **Check Console Version**:
+
    - Some regions have different console versions
    - Try refreshing the page or clearing browser cache
 

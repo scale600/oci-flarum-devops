@@ -62,26 +62,26 @@ Navigate to your GitHub repository → Settings → Secrets and variables → Ac
 
 #### Required Secrets
 
-| Secret Name | Description | Example |
-|-------------|-------------|---------|
-| `OCI_TENANCY_OCID` | OCI Tenancy OCID | `ocid1.tenancy.oc1..xxxxx` |
-| `OCI_USER_OCID` | OCI User OCID | `ocid1.user.oc1..xxxxx` |
-| `OCI_FINGERPRINT` | API Key Fingerprint | `xx:xx:xx:xx:xx:xx:xx:xx` |
-| `OCI_PRIVATE_KEY` | API Key Private Key | `-----BEGIN PRIVATE KEY-----...` |
-| `OCI_REGION` | OCI Region | `ap-seoul-1` |
-| `OCI_COMPARTMENT_OCID` | Compartment OCID | `ocid1.compartment.oc1..xxxxx` |
-| `SSH_PUBLIC_KEY` | SSH Public Key | `ssh-rsa AAAAB3NzaC1yc2E...` |
-| `SSH_PRIVATE_KEY` | SSH Private Key | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `MYSQL_ROOT_PASSWORD` | MySQL root password | `SecureRootPass123!` |
-| `MYSQL_PASSWORD` | MySQL user password | `SecureUserPass456!` |
-| `FLARUM_ADMIN_EMAIL` | Flarum admin email | `admin@yourdomain.com` |
-| `FLARUM_ADMIN_PASSWORD` | Flarum admin password | `SecureAdminPass789!` |
+| Secret Name             | Description           | Example                                  |
+| ----------------------- | --------------------- | ---------------------------------------- |
+| `OCI_TENANCY_OCID`      | OCI Tenancy OCID      | `ocid1.tenancy.oc1..xxxxx`               |
+| `OCI_USER_OCID`         | OCI User OCID         | `ocid1.user.oc1..xxxxx`                  |
+| `OCI_FINGERPRINT`       | API Key Fingerprint   | `xx:xx:xx:xx:xx:xx:xx:xx`                |
+| `OCI_PRIVATE_KEY`       | API Key Private Key   | `-----BEGIN PRIVATE KEY-----...`         |
+| `OCI_REGION`            | OCI Region            | `ap-seoul-1`                             |
+| `OCI_COMPARTMENT_OCID`  | Compartment OCID      | `ocid1.compartment.oc1..xxxxx`           |
+| `SSH_PUBLIC_KEY`        | SSH Public Key        | `ssh-rsa AAAAB3NzaC1yc2E...`             |
+| `SSH_PRIVATE_KEY`       | SSH Private Key       | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `MYSQL_ROOT_PASSWORD`   | MySQL root password   | `SecureRootPass123!`                     |
+| `MYSQL_PASSWORD`        | MySQL user password   | `SecureUserPass456!`                     |
+| `FLARUM_ADMIN_EMAIL`    | Flarum admin email    | `admin@yourdomain.com`                   |
+| `FLARUM_ADMIN_PASSWORD` | Flarum admin password | `SecureAdminPass789!`                    |
 
 #### Optional Secrets
 
-| Secret Name | Description | Example |
-|-------------|-------------|---------|
-| `DOMAIN_NAME` | Custom domain | `community.yourdomain.com` |
+| Secret Name         | Description         | Example                                |
+| ------------------- | ------------------- | -------------------------------------- |
+| `DOMAIN_NAME`       | Custom domain       | `community.yourdomain.com`             |
 | `SLACK_WEBHOOK_URL` | Slack notifications | `https://hooks.slack.com/services/...` |
 
 ### 3. Deploy Infrastructure
@@ -97,6 +97,7 @@ git push origin main
 ### 4. Access Your Forum
 
 After deployment (5-10 minutes), access your forum at:
+
 - **URL**: `http://<your-server-ip>`
 - **SSH**: `ssh opc@<your-server-ip>`
 
@@ -105,15 +106,17 @@ After deployment (5-10 minutes), access your forum at:
 ### Step 1: OCI Account Setup
 
 1. **Create OCI Account**
+
    - Visit [Oracle Cloud Infrastructure](https://cloud.oracle.com)
    - Sign up for Always Free Tier account
    - Verify your account (may take 24-48 hours)
 
 2. **Generate API Keys**
+
    ```bash
    # Generate SSH key pair
    ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
-   
+
    # Generate OCI API key
    # Go to OCI Console → Identity & Security → Users → API Keys
    # Click "Add API Key" → "Generate API Key Pair"
@@ -129,10 +132,12 @@ After deployment (5-10 minutes), access your forum at:
 ### Step 2: GitHub Repository Setup
 
 1. **Fork Repository**
+
    - Fork this repository to your GitHub account
    - Clone your fork locally
 
 2. **Configure Secrets**
+
    - Go to your repository → Settings → Secrets and variables → Actions
    - Add all required secrets as listed above
 
@@ -185,6 +190,7 @@ Edit `ansible/playbook.yml` to customize:
 ### Step 4: Deploy and Monitor
 
 1. **Trigger Deployment**
+
    ```bash
    git add .
    git commit -m "Initial deployment"
@@ -192,6 +198,7 @@ Edit `ansible/playbook.yml` to customize:
    ```
 
 2. **Monitor Deployment**
+
    - Go to Actions tab in GitHub
    - Watch the deployment progress
    - Check logs for any issues
@@ -348,6 +355,7 @@ mysql -u flarum -p flarum < backup.sql
 
 **Problem**: GitHub Actions workflow fails
 **Solution**:
+
 - Check GitHub Secrets are correctly set
 - Verify OCI credentials are valid
 - Check OCI region and compartment settings
@@ -356,6 +364,7 @@ mysql -u flarum -p flarum < backup.sql
 
 **Problem**: Cannot access Flarum forum
 **Solution**:
+
 - Check security group rules
 - Verify firewall settings
 - Check Docker container status
@@ -364,6 +373,7 @@ mysql -u flarum -p flarum < backup.sql
 
 **Problem**: Flarum cannot connect to database
 **Solution**:
+
 - Verify MySQL service is running
 - Check database credentials
 - Verify network connectivity
@@ -372,6 +382,7 @@ mysql -u flarum -p flarum < backup.sql
 
 **Problem**: SSL certificate not working
 **Solution**:
+
 - Check domain DNS settings
 - Verify Let's Encrypt configuration
 - Check certificate expiration
