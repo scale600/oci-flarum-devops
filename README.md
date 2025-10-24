@@ -501,3 +501,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Ready to deploy your Flarum community forum?** 🚀
 
 Start by setting up your GitHub Secrets and pushing to the main branch. The entire infrastructure will be deployed automatically!
+# Trigger deployment
