@@ -50,7 +50,7 @@ services:
       - UID=1000
       - GID=1000
       - DEBUG=false
-      - FORUM_URL=http://${ACTUAL_PUBLIC_IP}
+      - FORUM_URL=http://PLACEHOLDER_IP
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_NAME=${mysql_database}
@@ -84,8 +84,11 @@ networks:
     driver: bridge
 EOF
 
-# Get the actual public IP address
+# Get the actual public IP address and replace placeholder
 ACTUAL_PUBLIC_IP=$(curl -s http://169.254.169.254/opc/v1/vnics/ | jq -r '.[0].publicIp')
+
+# Replace placeholder IP in docker-compose.yml
+sed -i "s/PLACEHOLDER_IP/${ACTUAL_PUBLIC_IP}/g" docker-compose.yml
 
 # Create environment variables file
 cat > .env << EOF
