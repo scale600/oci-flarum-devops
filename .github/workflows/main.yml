@@ -78,7 +78,7 @@ jobs:
         TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
         TF_VAR_flarum_admin_username: "admin"
         TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -98,7 +98,7 @@ jobs:
         TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
         TF_VAR_flarum_admin_username: "admin"
         TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
       - name: Get Terraform Outputs
         id: terraform-output
