@@ -1,23 +1,23 @@
-DevOps 프로젝트로 Riderwin.com 블로그 독자를 위한 Flarum 커뮤니티 사이트를 OCI Always Free Tier에 배포하는 GitHub 저장소 이름을 정할 때, 프로젝트의 DevOps 특성(Terraform, Ansible, Docker, GitHub Actions)과 목적을 반영하는 이름을 추천합니다. **추천 이름: `riderwin-devops-oci`**
+This is a DevOps project to deploy a Flarum community forum for Riderwin.com's motorcycle community on OCI Always Free Tier. When choosing a GitHub repository name, we recommend a name that reflects the DevOps characteristics (Terraform, Ansible, Docker, GitHub Actions) and purpose. **Recommended name: `riderwin-devops-oci`**
 
-### 이유:
+### Reasons:
 
-- **명확성**: `riderwin`은 브랜드, `devops`는 Terraform/Ansible/GitHub Actions 기반 CI/CD를 강조, `oci`는 Oracle Cloud Infrastructure를 나타냄.
-- **DevOps 강조**: DevOps 프로젝트로 포지셔닝하며, 인프라 자동화와 배포 파이프라인을 명확히 표현.
-- **직관성**: 프로젝트의 기술 스택과 환경을 한눈에 이해 가능.
+- **Clarity**: `riderwin` represents the brand, `devops` emphasizes Terraform/Ansible/GitHub Actions-based CI/CD, and `oci` represents Oracle Cloud Infrastructure.
+- **DevOps Emphasis**: Positions as a DevOps project, clearly expressing infrastructure automation and deployment pipelines.
+- **Intuitive**: Allows understanding of the project's tech stack and environment at a glance.
 
-### 대안 이름:
+### Alternative Names:
 
-- `riderwin-community-devops`: 커뮤니티 포럼과 DevOps를 모두 강조.
-- `oci-flarum-devops`: Flarum과 OCI 중심, DevOps 워크플로우 반영.
-- `riderwin-infra`: 인프라 중심의 간결한 이름.
+- `riderwin-community-devops`: Emphasizes both community forum and DevOps.
+- `oci-flarum-devops`: Flarum and OCI focused, reflecting DevOps workflows.
+- `riderwin-infra`: Infrastructure-focused concise name.
 
-### 저장소 생성:
+### Repository Creation:
 
-- GitHub에서: New Repository > Name: `riderwin-devops-oci` > Public/Private 선택 > Initialize with README.
-- 로컬에서: `git clone https://github.com/yourusername/riderwin-devops-oci.git`.
+- On GitHub: New Repository > Name: `riderwin-devops-oci` > Public/Private selection > Initialize with README.
+- Locally: `git clone https://github.com/yourusername/riderwin-devops-oci.git`.
 
-### 초기 README 제안:
+### Initial README Suggestion:
 
 ```markdown
 # Riderwin DevOps OCI

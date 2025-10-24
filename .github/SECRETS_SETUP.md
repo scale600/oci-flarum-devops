@@ -1,144 +1,144 @@
-# GitHub Secrets 설정 가이드
+# GitHub Secrets Setup Guide
 
-이 문서는 GitHub Actions CI/CD 파이프라인이 정상적으로 작동하기 위해 필요한 GitHub Secrets 설정 방법을 설명합니다.
+This document explains how to set up the GitHub Secrets required for the GitHub Actions CI/CD pipeline to work properly.
 
-## 🔐 필요한 Secrets
+## 🔐 Required Secrets
 
-### 1. OCI (Oracle Cloud Infrastructure) 인증 정보
+### 1. OCI (Oracle Cloud Infrastructure) Authentication Information
 
 #### `OCI_TENANCY_OCID`
-- **설명**: OCI Tenancy OCID
-- **형식**: `ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-- **설정 방법**:
-  1. OCI 콘솔 → Identity & Security → Tenancy Details
-  2. Tenancy OCID 복사
+- **Description**: OCI Tenancy OCID
+- **Format**: `ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **Setup Method**:
+  1. OCI Console → Identity & Security → Tenancy Details
+  2. Copy Tenancy OCID
 
 #### `OCI_USER_OCID`
-- **설명**: OCI User OCID
-- **형식**: `ocid1.user.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-- **설정 방법**:
-  1. OCI 콘솔 → Identity & Security → Users
-  2. 사용자 선택 → User OCID 복사
+- **Description**: OCI User OCID
+- **Format**: `ocid1.user.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **Setup Method**:
+  1. OCI Console → Identity & Security → Users
+  2. Select user → Copy User OCID
 
 #### `OCI_FINGERPRINT`
-- **설명**: API Key Fingerprint
-- **형식**: `xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx`
-- **설정 방법**:
-  1. OCI 콘솔 → Identity & Security → Users
+- **Description**: API Key Fingerprint
+- **Format**: `xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx`
+- **Setup Method**:
+  1. OCI Console → Identity & Security → Users
   2. API Keys → Add API Key
   3. Generate API Key Pair → Download Private Key
-  4. Fingerprint 복사
+  4. Copy Fingerprint
 
 #### `OCI_PRIVATE_KEY`
-- **설명**: API Key Private Key (PEM 형식)
-- **형식**: 
+- **Description**: API Key Private Key (PEM format)
+- **Format**: 
   ```
   -----BEGIN PRIVATE KEY-----
   MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...
   -----END PRIVATE KEY-----
   ```
-- **설정 방법**:
-  1. API Key 생성 시 다운로드한 `.pem` 파일 내용 전체 복사
+- **Setup Method**:
+  1. Copy entire content of `.pem` file downloaded when creating API Key
 
 #### `OCI_REGION`
-- **설명**: OCI Region
-- **예시**: `ap-seoul-1`, `us-ashburn-1`
-- **설정 방법**:
-  1. OCI 콘솔 우상단 지역 선택
-  2. Region Identifier 복사
+- **Description**: OCI Region
+- **Example**: `ap-seoul-1`, `us-ashburn-1`
+- **Setup Method**:
+  1. Select region from top-right corner of OCI Console
+  2. Copy Region Identifier
 
 #### `OCI_COMPARTMENT_OCID`
-- **설명**: Compartment OCID
-- **형식**: `ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-- **설정 방법**:
-  1. OCI 콘솔 → Identity & Security → Compartments
-  2. Compartment 선택 → OCID 복사
+- **Description**: Compartment OCID
+- **Format**: `ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **Setup Method**:
+  1. OCI Console → Identity & Security → Compartments
+  2. Select Compartment → Copy OCID
 
-### 2. SSH 키 정보
+### 2. SSH Key Information
 
 #### `SSH_PUBLIC_KEY`
-- **설명**: SSH 공개키
-- **형식**: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... user@hostname`
-- **생성 방법**:
+- **Description**: SSH Public Key
+- **Format**: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... user@hostname`
+- **Generation Method**:
   ```bash
   ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
   cat ~/.ssh/id_rsa.pub
   ```
 
 #### `SSH_PRIVATE_KEY`
-- **설명**: SSH 개인키
-- **형식**: 
+- **Description**: SSH Private Key
+- **Format**: 
   ```
   -----BEGIN OPENSSH PRIVATE KEY-----
   b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn...
   -----END OPENSSH PRIVATE KEY-----
   ```
-- **생성 방법**:
+- **Generation Method**:
   ```bash
   cat ~/.ssh/id_rsa
   ```
 
-### 3. 데이터베이스 설정
+### 3. Database Configuration
 
 #### `MYSQL_ROOT_PASSWORD`
-- **설명**: MySQL root 사용자 비밀번호
-- **형식**: 강력한 비밀번호 (최소 12자, 특수문자 포함)
-- **예시**: `MySecureRootPass123!`
+- **Description**: MySQL root user password
+- **Format**: Strong password (minimum 12 characters, including special characters)
+- **Example**: `MySecureRootPass123!`
 
 #### `MYSQL_PASSWORD`
-- **설명**: Flarum 데이터베이스 사용자 비밀번호
-- **형식**: 강력한 비밀번호 (최소 12자, 특수문자 포함)
-- **예시**: `FlarumSecurePass456!`
+- **Description**: Flarum database user password
+- **Format**: Strong password (minimum 12 characters, including special characters)
+- **Example**: `FlarumSecurePass456!`
 
-### 4. Flarum 관리자 설정
+### 4. Flarum Administrator Configuration
 
 #### `FLARUM_ADMIN_EMAIL`
-- **설명**: Flarum 관리자 이메일
-- **형식**: 유효한 이메일 주소
-- **예시**: `admin@riderwin.com`
+- **Description**: Flarum administrator email
+- **Format**: Valid email address
+- **Example**: `admin@riderwin.com`
 
 #### `FLARUM_ADMIN_PASSWORD`
-- **설명**: Flarum 관리자 비밀번호
-- **형식**: 강력한 비밀번호 (최소 12자, 특수문자 포함)
-- **예시**: `AdminSecurePass789!`
+- **Description**: Flarum administrator password
+- **Format**: Strong password (minimum 12 characters, including special characters)
+- **Example**: `AdminSecurePass789!`
 
-### 5. 도메인 설정
+### 5. Domain Configuration
 
 #### `DOMAIN_NAME`
-- **설명**: Flarum 사이트 도메인 (선택사항)
-- **형식**: 유효한 도메인명
-- **예시**: `community.riderwin.com`
-- **참고**: 비워두면 IP 주소로 접속
+- **Description**: Flarum site domain (optional)
+- **Format**: Valid domain name
+- **Example**: `community.riderwin.com`
+- **Note**: Leave empty to access via IP address
 
-### 6. 알림 설정 (선택사항)
+### 6. Notification Configuration (Optional)
 
 #### `SLACK_WEBHOOK_URL`
-- **설명**: Slack 웹훅 URL (배포 알림용)
-- **형식**: `https://hooks.slack.com/services/[TEAM_ID]/[BOT_ID]/[TOKEN]` (예시)
-- **설정 방법**:
+- **Description**: Slack webhook URL (for deployment notifications)
+- **Format**: `https://hooks.slack.com/services/[TEAM_ID]/[BOT_ID]/[TOKEN]` (example)
+- **Setup Method**:
   1. Slack → Apps → Incoming Webhooks
-  2. Add to Slack → Webhook URL 복사
+  2. Add to Slack → Copy Webhook URL
 
-## 🛠️ GitHub Secrets 설정 방법
+## 🛠️ GitHub Secrets Setup Method
 
-### 1. GitHub 저장소에서 Secrets 설정
+### 1. Setting up Secrets in GitHub Repository
 
-1. **GitHub 저장소 접속**
-   - `https://github.com/scale600/oci-flarum-devops`
+1. **Access GitHub Repository**
+   - Go to `https://github.com/scale600/oci-flarum-devops`
 
-2. **Settings 탭 클릭**
-   - 저장소 상단 메뉴에서 Settings
+2. **Click Settings Tab**
+   - Click Settings from the repository top menu
 
-3. **Secrets and variables → Actions 클릭**
-   - 좌측 메뉴에서 Secrets and variables
-   - Actions 선택
+3. **Click Secrets and variables → Actions**
+   - From the left menu, select Secrets and variables
+   - Select Actions
 
-4. **New repository secret 클릭**
-   - 각 Secret을 위의 정보에 따라 추가
+4. **Click New repository secret**
+   - Add each Secret according to the information above
 
-### 2. 필수 Secrets 우선순위
+### 2. Required Secrets Priority
 
-#### 🔴 **최우선 (필수)**
+#### 🔴 **Highest Priority (Required)**
 1. `OCI_TENANCY_OCID`
 2. `OCI_USER_OCID`
 3. `OCI_FINGERPRINT`
@@ -146,7 +146,7 @@
 5. `OCI_REGION`
 6. `OCI_COMPARTMENT_OCID`
 
-#### 🟡 **중요 (권장)**
+#### 🟡 **Important (Recommended)**
 7. `SSH_PUBLIC_KEY`
 8. `SSH_PRIVATE_KEY`
 9. `MYSQL_ROOT_PASSWORD`
@@ -154,76 +154,76 @@
 11. `FLARUM_ADMIN_EMAIL`
 12. `FLARUM_ADMIN_PASSWORD`
 
-#### 🟢 **선택사항**
+#### 🟢 **Optional**
 13. `DOMAIN_NAME`
 14. `SLACK_WEBHOOK_URL`
 
-## ✅ Secrets 설정 확인
+## ✅ Secrets Setup Verification
 
-### 1. 설정 완료 확인
+### 1. Setup Completion Check
 ```bash
-# GitHub CLI로 확인 (선택사항)
+# Check with GitHub CLI (optional)
 gh secret list
 ```
 
-### 2. 워크플로우 테스트
-1. **Terraform 배포 테스트**
-   - `terraform/` 디렉토리에 변경사항 푸시
-   - Actions 탭에서 `Terraform Infrastructure Deployment` 실행 확인
+### 2. Workflow Testing
+1. **Terraform Deployment Test**
+   - Push changes to `terraform/` directory
+   - Check `Terraform Infrastructure Deployment` execution in Actions tab
 
-2. **Ansible 배포 테스트**
-   - `ansible/` 디렉토리에 변경사항 푸시
-   - Actions 탭에서 `Ansible Configuration Deployment` 실행 확인
+2. **Ansible Deployment Test**
+   - Push changes to `ansible/` directory
+   - Check `Ansible Configuration Deployment` execution in Actions tab
 
-3. **Docker 빌드 테스트**
-   - `docker/` 디렉토리에 변경사항 푸시
-   - Actions 탭에서 `Docker Build and Deploy` 실행 확인
+3. **Docker Build Test**
+   - Push changes to `docker/` directory
+   - Check `Docker Build and Deploy` execution in Actions tab
 
-## 🔒 보안 주의사항
+## 🔒 Security Considerations
 
-1. **Secrets 노출 방지**
-   - Secrets는 절대 코드에 하드코딩하지 마세요
-   - 로그에 Secrets가 출력되지 않도록 주의하세요
+1. **Prevent Secrets Exposure**
+   - Never hardcode secrets in code
+   - Be careful not to output secrets in logs
 
-2. **정기적인 Secrets 갱신**
-   - API 키는 3-6개월마다 갱신 권장
-   - 비밀번호는 6-12개월마다 변경 권장
+2. **Regular Secrets Renewal**
+   - Renew API keys every 3-6 months
+   - Change passwords every 6-12 months
 
-3. **접근 권한 관리**
-   - 필요한 사용자에게만 Secrets 접근 권한 부여
-   - 불필요한 Secrets는 삭제
+3. **Access Permission Management**
+   - Grant secrets access only to necessary users
+   - Delete unnecessary secrets
 
-## 🆘 문제 해결
+## 🆘 Troubleshooting
 
-### 1. OCI 인증 오류
+### 1. OCI Authentication Error
 ```
 Error: Authentication failed
 ```
-**해결방법**:
-- OCI 인증 정보가 정확한지 확인
-- API Key가 활성화되어 있는지 확인
-- Region이 올바른지 확인
+**Solution**:
+- Verify OCI authentication information is correct
+- Check if API Key is activated
+- Verify region is correct
 
-### 2. SSH 연결 오류
+### 2. SSH Connection Error
 ```
 Error: Permission denied (publickey)
 ```
-**해결방법**:
-- SSH 키가 올바르게 설정되었는지 확인
-- 공개키가 OCI 인스턴스에 등록되었는지 확인
+**Solution**:
+- Verify SSH keys are set correctly
+- Check if public key is registered in OCI instance
 
-### 3. 데이터베이스 연결 오류
+### 3. Database Connection Error
 ```
 Error: Access denied for user
 ```
-**해결방법**:
-- MySQL 비밀번호가 올바른지 확인
-- 데이터베이스 사용자 권한 확인
+**Solution**:
+- Verify MySQL password is correct
+- Check database user permissions
 
-## 📞 지원
+## 📞 Support
 
-문제가 지속되면 다음을 확인하세요:
-1. GitHub Actions 로그 확인
-2. OCI 콘솔에서 리소스 상태 확인
-3. SSH 연결 테스트
-4. 데이터베이스 연결 테스트
+If problems persist, check the following:
+1. GitHub Actions logs
+2. OCI Console resource status
+3. SSH connection test
+4. Database connection test
