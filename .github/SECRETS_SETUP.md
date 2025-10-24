@@ -86,28 +86,28 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 - **Example**: `MySecureRootPass123!`
 
 #### `MYSQL_PASSWORD`
-- **Description**: Flarum database user password
+- **Description**: Application database user password
 - **Format**: Strong password (minimum 12 characters, including special characters)
-- **Example**: `FlarumSecurePass456!`
+- **Example**: `AppSecurePass456!`
 
-### 4. Flarum Administrator Configuration
+### 4. Application Administrator Configuration
 
-#### `FLARUM_ADMIN_EMAIL`
-- **Description**: Flarum administrator email
+#### `APP_ADMIN_EMAIL`
+- **Description**: Application administrator email
 - **Format**: Valid email address
-- **Example**: `admin@riderwin.com`
+- **Example**: `admin@example.com`
 
-#### `FLARUM_ADMIN_PASSWORD`
-- **Description**: Flarum administrator password
+#### `APP_ADMIN_PASSWORD`
+- **Description**: Application administrator password
 - **Format**: Strong password (minimum 12 characters, including special characters)
 - **Example**: `AdminSecurePass789!`
 
-### 5. Domain Configuration
+### 5. Domain Configuration (Optional)
 
 #### `DOMAIN_NAME`
-- **Description**: Flarum site domain (optional)
+- **Description**: Application domain (optional)
 - **Format**: Valid domain name
-- **Example**: `community.riderwin.com`
+- **Example**: `app.example.com`
 - **Note**: Leave empty to access via IP address
 
 ### 6. Notification Configuration (Optional)
@@ -124,7 +124,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 ### 1. Setting up Secrets in GitHub Repository
 
 1. **Access GitHub Repository**
-   - Go to `https://github.com/scale600/oci-flarum-devops`
+   - Go to your repository settings
 
 2. **Click Settings Tab**
    - Click Settings from the repository top menu
@@ -151,8 +151,8 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 8. `SSH_PRIVATE_KEY`
 9. `MYSQL_ROOT_PASSWORD`
 10. `MYSQL_PASSWORD`
-11. `FLARUM_ADMIN_EMAIL`
-12. `FLARUM_ADMIN_PASSWORD`
+11. `APP_ADMIN_EMAIL`
+12. `APP_ADMIN_PASSWORD`
 
 #### 🟢 **Optional**
 13. `DOMAIN_NAME`
