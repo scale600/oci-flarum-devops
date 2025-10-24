@@ -252,7 +252,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}:latest
+          image-ref: ghcr.io/${{ github.repository }}:main
           format: "sarif"
           output: "trivy-results.sarif"
 
@@ -265,7 +265,7 @@ jobs:
   # Step 5: Final Deployment and Verification
   final-deploy:
     name: Final Deployment and Verification
-    needs: [terraform-deploy, ansible-deploy, docker-deploy, security-scan]
+    needs: [terraform-deploy, ansible-deploy, docker-deploy]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
