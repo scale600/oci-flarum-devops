@@ -395,20 +395,3 @@ jobs:
           echo "2. Access the application URL to complete setup" >> $GITHUB_STEP_SUMMARY
           echo "3. Configure SSL certificate if domain is set up" >> $GITHUB_STEP_SUMMARY
 
-      - name: Notify deployment success
-        if: success()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: success
-          text: "🚀 Application deployment successful! Access: http://${{ needs.terraform-deploy.outputs.web_ip }}"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Notify deployment failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: failure
-          text: "❌ Application deployment failed!"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

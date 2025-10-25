@@ -260,15 +260,6 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
      - Store in a password manager
      - This is used by the Flarum application to connect to MySQL
 
-### 4. Notification Configuration (Optional)
-
-#### `SLACK_WEBHOOK_URL`
-
-- **Description**: Slack webhook URL (for deployment notifications)
-- **Format**: `https://hooks.slack.com/services/[TEAM_ID]/[BOT_ID]/[TOKEN]` (example)
-- **Setup Method**:
-  1. Slack → Apps → Incoming Webhooks
-  2. Add to Slack → Copy Webhook URL
 
 ## 🛠️ GitHub Secrets Setup Method
 
@@ -308,9 +299,6 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 9. `MYSQL_ROOT_PASSWORD`
 10. `MYSQL_PASSWORD`
 
-#### 🟢 **Optional**
-
-11. `SLACK_WEBHOOK_URL`
 
 ## ✅ Secrets Setup Verification
 

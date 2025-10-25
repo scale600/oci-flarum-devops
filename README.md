@@ -20,24 +20,27 @@ This project demonstrates a complete DevOps pipeline for deploying a scalable Fl
 ┌─────────────────────────────────────────────────────────────┐
 │                    OCI Always Free Tier                     │
 │                                                             │
-│  ┌─────────────────┐    ┌─────────────────────────────────┐  │
-│  │   Public Subnet │    │      Private Subnet            │  │
-│  │                 │    │                                 │  │
-│  │  ┌─────────────┐│    │  ┌─────────────────────────┐  │  │
-│  │  │ Flarum Web  ││    │  │    MySQL Database       │  │  │
-│  │  │   Server    ││◄───┤  │      Server              │  │  │
-│  │  │ (2 OCPU)    ││    │  │    (1 OCPU)             │  │  │
-│  │  │ 12GB RAM    ││    │  │    6GB RAM               │  │  │
-│  │  └─────────────┘│    │  └─────────────────────────┘  │  │
-│  └─────────────────┘    └─────────────────────────────────┘  │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │                Public Subnet                           │  │
+│  │                                                       │  │
+│  │  ┌─────────────────────────────────────────────────┐  │  │
+│  │  │           Flarum Web Server                    │  │  │
+│  │  │         (1 OCPU, 1GB RAM)                     │  │  │
+│  │  │                                               │  │  │
+│  │  │  ┌─────────────┐    ┌─────────────────────┐  │  │  │
+│  │  │  │   Flarum    │    │      MySQL          │  │  │  │
+│  │  │  │  Container  │◄───┤    Container        │  │  │  │
+│  │  │  │             │    │   (Docker)          │  │  │  │
+│  │  │  └─────────────┘    └─────────────────────┘  │  │  │
+│  │  └─────────────────────────────────────────────────┘  │  │
+│  └─────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Components
 
 - **Web Server**: Flarum forum application with Docker
-- **Database**: MySQL 8.0 with optimized configuration
-- **Load Balancer**: Nginx reverse proxy with SSL termination
+- **Database**: MySQL 8.0 running as Docker container
 - **Monitoring**: Health checks and automated alerts
 - **Security**: Network isolation and firewall rules
 
@@ -62,18 +65,18 @@ Navigate to your GitHub repository → Settings → Secrets and variables → Ac
 
 #### Required Secrets
 
-| Secret Name             | Description           | Example                                  |
-| ----------------------- | --------------------- | ---------------------------------------- |
-| `OCI_TENANCY_OCID`      | OCI Tenancy OCID      | `ocid1.tenancy.oc1..xxxxx`               |
-| `OCI_USER_OCID`         | OCI User OCID         | `ocid1.user.oc1..xxxxx`                  |
-| `OCI_FINGERPRINT`       | API Key Fingerprint   | `xx:xx:xx:xx:xx:xx:xx:xx`                |
-| `OCI_PRIVATE_KEY`       | API Key Private Key   | `-----BEGIN PRIVATE KEY-----...`         |
-| `OCI_REGION`            | OCI Region            | `ap-seoul-1`                             |
-| `OCI_COMPARTMENT_OCID`  | Compartment OCID      | `ocid1.compartment.oc1..xxxxx`           |
-| `SSH_PUBLIC_KEY`        | SSH Public Key        | `ssh-rsa AAAAB3NzaC1yc2E...`             |
-| `SSH_PRIVATE_KEY`       | SSH Private Key       | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `MYSQL_ROOT_PASSWORD`   | MySQL root password   | `SecureRootPass123!`                     |
-| `MYSQL_PASSWORD`        | MySQL user password   | `SecureUserPass456!`                     |
+| Secret Name            | Description         | Example                                  |
+| ---------------------- | ------------------- | ---------------------------------------- |
+| `OCI_TENANCY_OCID`     | OCI Tenancy OCID    | `ocid1.tenancy.oc1..xxxxx`               |
+| `OCI_USER_OCID`        | OCI User OCID       | `ocid1.user.oc1..xxxxx`                  |
+| `OCI_FINGERPRINT`      | API Key Fingerprint | `xx:xx:xx:xx:xx:xx:xx:xx`                |
+| `OCI_PRIVATE_KEY`      | API Key Private Key | `-----BEGIN PRIVATE KEY-----...`         |
+| `OCI_REGION`           | OCI Region          | `ap-seoul-1`                             |
+| `OCI_COMPARTMENT_OCID` | Compartment OCID    | `ocid1.compartment.oc1..xxxxx`           |
+| `SSH_PUBLIC_KEY`       | SSH Public Key      | `ssh-rsa AAAAB3NzaC1yc2E...`             |
+| `SSH_PRIVATE_KEY`      | SSH Private Key     | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `MYSQL_ROOT_PASSWORD`  | MySQL root password | `SecureRootPass123!`                     |
+| `MYSQL_PASSWORD`       | MySQL user password | `SecureUserPass456!`                     |
 
 #### Optional Secrets
 
@@ -97,6 +100,7 @@ After deployment (5-10 minutes), access your forum at:
 
 - **URL**: `http://<your-server-ip>`
 - **SSH**: `ssh opc@<your-server-ip>`
+- **Setup**: Complete the initial Flarum setup through the web interface
 
 ## 📋 Detailed Setup Guide
 
@@ -195,8 +199,8 @@ Edit `ansible/playbook.yml` to customize:
 
 3. **Verify Deployment**
    - Access your forum URL
-   - Complete Flarum setup wizard
-   - Test all functionality
+   - Complete Flarum initial setup through web interface
+   - Create admin account and configure your forum
 
 ## 🔧 Configuration Options
 
@@ -309,7 +313,7 @@ mysql -u flarum -p flarum < backup.sql
 
 ### Access Control
 
-- **Admin Authentication**: Secure admin account setup
+- **Admin Authentication**: Complete setup through web interface
 - **User Permissions**: Flarum's built-in permission system
 - **API Security**: Secure API endpoints
 - **Session Management**: Secure session handling
@@ -485,20 +489,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Oracle Cloud**: For the Always Free Tier
 - **GitHub**: For the CI/CD platform
 - **Open Source Community**: For the amazing tools and libraries
-<<<<<<< HEAD
 
 ---
 
 **Ready to deploy your Flarum community forum?** 🚀
 
 Start by setting up your GitHub Secrets and pushing to the main branch. The entire infrastructure will be deployed automatically!
-# Trigger deployment
-# Retry deployment with updated compartment OCID
-# 재배포 트리거 - Fri Oct 24 15:36:11 PDT 2025
-# 재배포 시작 - Fri Oct 24 15:56:43 PDT 2025
-# 재배포 시작 - Fri Oct 24 18:09:39 PDT 2025
-# SSH 키 추가 후 재배포 - Fri Oct 24 18:53:12 PDT 2025
-=======
->>>>>>> 1606bdd75f8f4b931d18fa380fe509e03dba3073
-# Arm 기반 배포 시작 - Fri Oct 24 21:04:22 PDT 2025
-# US West (San Jose) 리전으로 변경 - Fri Oct 24 21:09:23 PDT 2025

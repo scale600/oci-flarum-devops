@@ -2,20 +2,20 @@ name: Ansible Configuration Deployment
 
 on:
   push:
-    branches: [ main ]
-    paths: [ 'ansible/**' ]
+    branches: [main]
+    paths: ["ansible/**"]
   pull_request:
-    branches: [ main ]
-    paths: [ 'ansible/**' ]
+    branches: [main]
+    paths: ["ansible/**"]
   workflow_dispatch:
     inputs:
       target_host:
-        description: 'Target host IP address'
+        description: "Target host IP address"
         required: true
         type: string
 
 env:
-  ANSIBLE_VERSION: '7.0.0'
+  ANSIBLE_VERSION: "7.0.0"
 
 jobs:
   ansible-lint:
@@ -24,27 +24,27 @@ jobs:
     defaults:
       run:
         working-directory: ./ansible
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-    - name: Install Ansible and dependencies
-      run: |
-        pip install ansible==${{ env.ANSIBLE_VERSION }} ansible-lint yamllint
-        ansible --version
-        ansible-lint --version
+      - name: Install Ansible and dependencies
+        run: |
+          pip install ansible==${{ env.ANSIBLE_VERSION }} ansible-lint yamllint
+          ansible --version
+          ansible-lint --version
 
-    - name: Run ansible-lint
-      run: ansible-lint playbook.yml
+      - name: Run ansible-lint
+        run: ansible-lint playbook.yml
 
-    - name: Run yamllint
-      run: yamllint .
+      - name: Run yamllint
+        run: yamllint .
 
   ansible-deploy:
     name: Ansible Deploy
@@ -54,56 +54,33 @@ jobs:
     defaults:
       run:
         working-directory: ./ansible
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-    - name: Install Ansible
-      run: |
-        pip install ansible==${{ env.ANSIBLE_VERSION }}
-        ansible --version
+      - name: Install Ansible
+        run: |
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+          ansible --version
 
-    - name: Create SSH key file
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+      - name: Create SSH key file
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
 
-    - name: Add host to known_hosts
-      run: |
-        ssh-keyscan -H ${{ github.event.inputs.target_host || 'flarum-instance' }} >> ~/.ssh/known_hosts
+      - name: Skip ansible-deploy (handled by main.yml)
+        run: |
+          echo "Ansible deployment is handled by main.yml workflow"
+          echo "This workflow is for manual testing only"
 
-    - name: Create inventory file
-      run: |
-        cat > inventory.ini << EOF
-        [flarum_servers]
-        ${{ github.event.inputs.target_host || 'flarum-instance' }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
-        EOF
-
-    - name: Test connection
-      run: |
-        ansible all -i inventory.ini -m ping
-
-    - name: Run Ansible playbook
-      run: |
-        ansible-playbook -i inventory.ini playbook.yml -v
-      env:
-        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-        MYSQL_DATABASE: "flarum"
-        MYSQL_USER: "flarum"
-        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-
-    - name: Verify deployment
-      run: |
-        ansible all -i inventory.ini -m shell -a "docker ps"
-        ansible all -i inventory.ini -m shell -a "systemctl status docker"
 
   ansible-rollback:
     name: Ansible Rollback
@@ -112,32 +89,32 @@ jobs:
     defaults:
       run:
         working-directory: ./ansible
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-    - name: Install Ansible
-      run: pip install ansible==${{ env.ANSIBLE_VERSION }}
+      - name: Install Ansible
+        run: pip install ansible==${{ env.ANSIBLE_VERSION }}
 
-    - name: Create SSH key file
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+      - name: Create SSH key file
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
-    - name: Create inventory file
-      run: |
-        cat > inventory.ini << EOF
-        [flarum_servers]
-        ${{ github.event.inputs.target_host }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
-        EOF
+      - name: Create inventory file
+        run: |
+          cat > inventory.ini << EOF
+          [flarum_servers]
+          ${{ github.event.inputs.target_host }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
+          EOF
 
-    - name: Run rollback playbook
-      run: |
-        ansible-playbook -i inventory.ini rollback.yml -v
+      - name: Run rollback playbook
+        run: |
+          ansible-playbook -i inventory.ini rollback.yml -v

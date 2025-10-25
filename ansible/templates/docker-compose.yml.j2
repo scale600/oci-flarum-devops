@@ -46,6 +46,12 @@ services:
       - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - flarum_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s

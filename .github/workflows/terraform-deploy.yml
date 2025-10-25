@@ -86,10 +86,6 @@ jobs:
           TF_VAR_mysql_database: "flarum"
           TF_VAR_mysql_user: "flarum"
           TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
-          TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
-          TF_VAR_flarum_admin_username: "admin"
-          TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
@@ -165,10 +161,6 @@ jobs:
           TF_VAR_mysql_database: "flarum"
           TF_VAR_mysql_user: "flarum"
           TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
-          TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
-          TF_VAR_flarum_admin_username: "admin"
-          TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
       - name: Get Terraform Outputs
         run: |
@@ -179,7 +171,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: terraform-outputs
-          path: terraform/terraform-outputs.json
+          path: terraform-outputs.json
 
       - name: Comment on PR
         if: github.event_name == 'pull_request'
@@ -187,7 +179,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const outputs = JSON.parse(fs.readFileSync('terraform/terraform-outputs.json', 'utf8'));
+            const outputs = JSON.parse(fs.readFileSync('terraform-outputs.json', 'utf8'));
 
             const comment = `## 🚀 Infrastructure Deployment Results
 
@@ -273,7 +265,3 @@ jobs:
           TF_VAR_mysql_database: "flarum"
           TF_VAR_mysql_user: "flarum"
           TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
-          TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
-          TF_VAR_flarum_admin_username: "admin"
-          TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
