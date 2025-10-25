@@ -11,22 +11,49 @@
     docker_compose_version: "2.21.0"
 
   tasks:
-    - name: Update system packages
+    - name: Create swap file for micro instance
+      ansible.builtin.shell: |
+        # Create 2GB swap file
+        sudo fallocate -l 2G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile
+        echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+      changed_when: false
+
+    - name: Update system packages (with swap enabled)
       ansible.builtin.dnf:
         name: "*"
         state: present
         update_cache: true
 
-    - name: Install required packages
+    - name: Install Docker
+      ansible.builtin.dnf:
+        name: docker
+        state: present
+
+    - name: Install Docker Compose
+      ansible.builtin.dnf:
+        name: docker-compose
+        state: present
+
+    - name: Install basic tools
       ansible.builtin.dnf:
         name:
-          - docker
-          - docker-compose
           - git
           - curl
           - wget
           - unzip
-          - firewalld
+        state: present
+
+    - name: Install firewalld
+      ansible.builtin.dnf:
+        name: firewalld
+        state: present
+
+    - name: Install certbot
+      ansible.builtin.dnf:
+        name:
           - certbot
           - python3-certbot-dns-cloudflare
         state: present
