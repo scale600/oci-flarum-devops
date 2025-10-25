@@ -511,3 +511,4 @@ Start by setting up your GitHub Secrets and pushing to the main branch. The enti
 =======
 >>>>>>> 1606bdd75f8f4b931d18fa380fe509e03dba3073
 # Arm 기반 배포 시작 - Fri Oct 24 21:04:22 PDT 2025
+# US West (San Jose) 리전으로 변경 - Fri Oct 24 21:09:23 PDT 2025
