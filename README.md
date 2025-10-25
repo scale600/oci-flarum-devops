@@ -495,6 +495,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Oracle Cloud**: For the Always Free Tier
 - **GitHub**: For the CI/CD platform
 - **Open Source Community**: For the amazing tools and libraries
+<<<<<<< HEAD
 
 ---
 
@@ -507,3 +508,5 @@ Start by setting up your GitHub Secrets and pushing to the main branch. The enti
 # 재배포 시작 - Fri Oct 24 15:56:43 PDT 2025
 # 재배포 시작 - Fri Oct 24 18:09:39 PDT 2025
 # SSH 키 추가 후 재배포 - Fri Oct 24 18:53:12 PDT 2025
+=======
+>>>>>>> 1606bdd75f8f4b931d18fa380fe509e03dba3073
