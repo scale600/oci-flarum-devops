@@ -13,6 +13,7 @@
   tasks:
     - name: Create swap file for micro instance
       ansible.builtin.shell: |
+        set -o pipefail
         # Create 2GB swap file
         sudo fallocate -l 2G /swapfile
         sudo chmod 600 /swapfile
