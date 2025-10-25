@@ -153,9 +153,15 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          # Validate SSH key format
+          ssh-keygen -l -f ~/.ssh/id_rsa || echo "SSH key validation failed"
+          # Generate public key
           ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+          # Start SSH agent and add key
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
+          # Test SSH key
+          ssh-add -l
 
       - name: Add host to known_hosts
         run: |
@@ -168,9 +174,14 @@ jobs:
           ${{ needs.terraform-deploy.outputs.web_ip }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
           EOF
 
-      - name: Test connection
+      - name: Test SSH connection
         run: |
-          ansible all -i inventory.ini -m ping
+          # Test direct SSH connection first
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 opc@${{ needs.terraform-deploy.outputs.web_ip }} "echo 'SSH connection successful'"
+          
+      - name: Test Ansible connection
+        run: |
+          ansible all -i inventory.ini -m ping --timeout=30
 
       - name: Run Ansible playbook
         run: |
