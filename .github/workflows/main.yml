@@ -190,13 +190,13 @@ jobs:
         run: |
           echo "Waiting for instance to be fully ready..."
           sleep 300  # Wait 5 minutes for instance to fully initialize
-          
+
       - name: Test instance connectivity
         run: |
           echo "Testing instance connectivity..."
           # Test if instance is reachable
           ping -c 3 ${{ needs.terraform-deploy.outputs.web_ip }} || echo "Ping failed, but continuing..."
-          
+
           # Test if SSH port is open
           nc -z -v ${{ needs.terraform-deploy.outputs.web_ip }} 22 || echo "SSH port test failed, but continuing..."
 
@@ -225,7 +225,7 @@ jobs:
         run: |
           cat > inventory.ini << EOF
           [flarum_servers]
-          ${{ needs.terraform-deploy.outputs.web_ip }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa
+          ${{ needs.terraform-deploy.outputs.web_ip }} ansible_user=opc ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -o ConnectTimeout=60'
           EOF
 
       - name: Test SSH connection with retry
@@ -248,7 +248,7 @@ jobs:
 
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i inventory.ini playbook.yml -v
+          ansible-playbook -i inventory.ini playbook.yml -v --timeout=300 --forks=1
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: "flarum"
