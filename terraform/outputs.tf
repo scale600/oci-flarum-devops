@@ -62,7 +62,7 @@ output "resource_summary" {
     flarum_instance = {
       name        = oci_core_instance.flarum_instance.display_name
       public_ip   = oci_core_instance.flarum_instance.public_ip
-      shape       = "VM.Standard.E2.1.Micro (1 OCPU, 1GB RAM)"
+      shape       = "VM.Standard.A1.Flex (2 OCPU, 12GB RAM)"
     }
     mysql_container = {
       description = "MySQL running as Docker container on same instance"
