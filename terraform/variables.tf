@@ -62,31 +62,6 @@ variable "mysql_password" {
   sensitive   = true
 }
 
-# Flarum 설정
-variable "flarum_admin_email" {
-  description = "Flarum admin email"
-  type        = string
-  default     = "admin@riderwin.com"
-}
-
-variable "flarum_admin_username" {
-  description = "Flarum admin username"
-  type        = string
-  default     = "admin"
-}
-
-variable "flarum_admin_password" {
-  description = "Flarum admin password"
-  type        = string
-  sensitive   = true
-}
-
-# 도메인 설정
-variable "domain_name" {
-  description = "Domain name for Flarum site"
-  type        = string
-  default     = "community.riderwin.com"
-}
 
 # 태그 설정
 variable "project_name" {

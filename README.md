@@ -74,14 +74,11 @@ Navigate to your GitHub repository → Settings → Secrets and variables → Ac
 | `SSH_PRIVATE_KEY`       | SSH Private Key       | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
 | `MYSQL_ROOT_PASSWORD`   | MySQL root password   | `SecureRootPass123!`                     |
 | `MYSQL_PASSWORD`        | MySQL user password   | `SecureUserPass456!`                     |
-| `FLARUM_ADMIN_EMAIL`    | Flarum admin email    | `admin@yourdomain.com`                   |
-| `FLARUM_ADMIN_PASSWORD` | Flarum admin password | `SecureAdminPass789!`                    |
 
 #### Optional Secrets
 
 | Secret Name         | Description         | Example                                |
 | ------------------- | ------------------- | -------------------------------------- |
-| `DOMAIN_NAME`       | Custom domain       | `community.yourdomain.com`             |
 | `SLACK_WEBHOOK_URL` | Slack notifications | `https://hooks.slack.com/services/...` |
 
 ### 3. Deploy Infrastructure
@@ -169,13 +166,6 @@ mysql_database   = "flarum"
 mysql_user       = "flarum"
 mysql_password   = "YourSecureUserPassword456!"
 
-# Flarum Configuration
-flarum_admin_email    = "admin@yourdomain.com"
-flarum_admin_username = "admin"
-flarum_admin_password = "YourSecureAdminPassword789!"
-
-# Domain Configuration (Optional)
-domain_name = "community.yourdomain.com"
 ```
 
 #### Ansible Configuration
