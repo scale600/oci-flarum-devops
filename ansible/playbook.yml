@@ -1,7 +1,7 @@
 ---
 - name: Configure Flarum Community Server
   hosts: flarum_servers
-  become: yes
+  become: true
   vars:
     mysql_root_password: "{{ MYSQL_ROOT_PASSWORD }}"
     mysql_database: "{{ MYSQL_DATABASE | default('flarum') }}"
@@ -12,13 +12,13 @@
 
   tasks:
     - name: Update system packages
-      dnf:
+      ansible.builtin.dnf:
         name: "*"
-        state: latest
-        update_cache: yes
+        state: present
+        update_cache: true
 
     - name: Install required packages
-      dnf:
+      ansible.builtin.dnf:
         name:
           - docker
           - docker-compose
@@ -32,116 +32,119 @@
         state: present
 
     - name: Start and enable Docker service
-      systemd:
+      ansible.builtin.systemd:
         name: docker
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Start and enable firewalld
-      systemd:
+      ansible.builtin.systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Add opc user to docker group
-      user:
+      ansible.builtin.user:
         name: opc
         groups: docker
-        append: yes
+        append: true
 
     - name: Create Flarum data directory
-      file:
+      ansible.builtin.file:
         path: "{{ flarum_data_dir }}"
         state: directory
         owner: opc
         group: opc
-        mode: '0755'
+        mode: "0755"
 
     - name: Create Docker Compose file
-      template:
+      ansible.builtin.template:
         src: docker-compose.yml.j2
         dest: "{{ flarum_data_dir }}/docker-compose.yml"
         owner: opc
         group: opc
-        mode: '0644'
+        mode: "0644"
 
     - name: Create environment file
-      template:
-        src: .env.j2
+      ansible.builtin.template:
+        src: env.j2
         dest: "{{ flarum_data_dir }}/.env"
         owner: opc
         group: opc
-        mode: '0600'
+        mode: "0600"
 
     - name: Create Flarum configuration script
-      template:
+      ansible.builtin.template:
         src: configure-flarum.sh.j2
         dest: "{{ flarum_data_dir }}/configure-flarum.sh"
         owner: opc
         group: opc
-        mode: '0755'
+        mode: "0755"
 
     - name: Create SSL setup script
-      template:
+      ansible.builtin.template:
         src: setup-ssl.sh.j2
         dest: "{{ flarum_data_dir }}/setup-ssl.sh"
         owner: opc
         group: opc
-        mode: '0755'
+        mode: "0755"
 
     - name: Configure firewall rules
-      firewalld:
+      ansible.posix.firewalld:
         port: "{{ item }}"
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
       loop:
         - "80/tcp"
         - "443/tcp"
         - "22/tcp"
 
     - name: Start Flarum services
-      shell: |
+      ansible.builtin.shell: |
         cd {{ flarum_data_dir }}
         docker-compose up -d
+      become: true
       become_user: opc
+      changed_when: false
 
     - name: Wait for services to be ready
-      wait_for:
+      ansible.builtin.wait_for:
         port: 80
         host: "{{ ansible_default_ipv4.address }}"
         delay: 30
         timeout: 300
 
     - name: Display Flarum setup information
-      debug:
+      ansible.builtin.debug:
         msg: |
           Flarum is now running!
           Access your forum at: http://{{ ansible_default_ipv4.address }}
           Complete the initial setup through the web interface.
 
     - name: Create health check script
-      template:
+      ansible.builtin.template:
         src: health-check.sh.j2
         dest: "{{ flarum_data_dir }}/health-check.sh"
         owner: opc
         group: opc
-        mode: '0755'
+        mode: "0755"
 
     - name: Create systemd service for health monitoring
-      template:
+      ansible.builtin.template:
         src: flarum-health.service.j2
         dest: /etc/systemd/system/flarum-health.service
-      notify: reload systemd
+        mode: "0644"
+      notify: Reload systemd
 
     - name: Start and enable health monitoring service
-      systemd:
+      ansible.builtin.systemd:
         name: flarum-health
         state: started
-        enabled: yes
-        daemon_reload: yes
+        enabled: true
+        daemon_reload: true
 
   handlers:
-    - name: reload systemd
-      systemd:
-        daemon_reload: yes
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
