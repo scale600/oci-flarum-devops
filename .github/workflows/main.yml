@@ -59,6 +59,9 @@ jobs:
           tenancy=${{ secrets.OCI_TENANCY_OCID }}
           region=${{ secrets.OCI_REGION }}
           EOF
+          
+          # Test OCI CLI authentication
+          oci iam user get --user-id ${{ secrets.OCI_USER_OCID }} || echo "OCI authentication test failed"
         env:
           OCI_CLI_AUTH: api_key
 
