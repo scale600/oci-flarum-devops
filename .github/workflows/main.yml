@@ -59,7 +59,7 @@ jobs:
           tenancy=${{ secrets.OCI_TENANCY_OCID }}
           region=${{ secrets.OCI_REGION }}
           EOF
-          
+
           # Test OCI CLI authentication
           oci iam user get --user-id ${{ secrets.OCI_USER_OCID }} || echo "OCI authentication test failed"
         env:
@@ -88,10 +88,6 @@ jobs:
           TF_VAR_mysql_database: "flarum"
           TF_VAR_mysql_user: "flarum"
           TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
-          TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
-          TF_VAR_flarum_admin_username: "admin"
-          TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -108,10 +104,6 @@ jobs:
           TF_VAR_mysql_database: "flarum"
           TF_VAR_mysql_user: "flarum"
           TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
-          TF_VAR_flarum_admin_email: ${{ secrets.FLARUM_ADMIN_EMAIL }}
-          TF_VAR_flarum_admin_username: "admin"
-          TF_VAR_flarum_admin_password: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
 
       - name: Get Terraform Outputs
         id: terraform-output
@@ -257,10 +249,6 @@ jobs:
           MYSQL_DATABASE: "flarum"
           MYSQL_USER: "flarum"
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          FLARUM_ADMIN_EMAIL: ${{ secrets.FLARUM_ADMIN_EMAIL }}
-          FLARUM_ADMIN_USERNAME: "admin"
-          FLARUM_ADMIN_PASSWORD: ${{ secrets.FLARUM_ADMIN_PASSWORD }}
-          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
 
   # Step 3: Docker Image Build and Deployment
   docker-deploy:

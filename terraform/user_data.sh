@@ -122,14 +122,8 @@ cat > /home/opc/setup-ssl.sh << 'EOF'
 #!/bin/bash
 # SSL certificate setup script (run after domain setup)
 
-DOMAIN_NAME="${domain_name}"
-EMAIL="admin@riderwin.com"
-
-# Issue SSL certificate with Certbot
-certbot certonly --standalone -d $DOMAIN_NAME --email $EMAIL --agree-tos --non-interactive
-
-# Configure SSL certificate for use in Docker containers
-# (additional configuration needed)
+# Note: Configure domain and email before running this script
+# certbot certonly --standalone -d YOUR_DOMAIN --email YOUR_EMAIL --agree-tos --non-interactive
 EOF
 
 chmod +x /home/opc/setup-ssl.sh

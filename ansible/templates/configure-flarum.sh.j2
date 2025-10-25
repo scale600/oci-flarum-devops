@@ -1,53 +1,8 @@
 #!/bin/bash
 
-# Flarum initial configuration script
+# Flarum initial setup script
 set -e
 
-echo "Starting Flarum configuration..."
-
-# Check if Flarum is already configured
-if [ -f "/opt/flarum/flarum_configured" ]; then
-    echo "Flarum is already configured. Skipping..."
-    exit 0
-fi
-
-# Check if Docker containers are running
-cd /opt/flarum
-if ! docker-compose ps | grep -q "Up"; then
-    echo "Starting Docker containers..."
-    docker-compose up -d
-    sleep 30
-fi
-
-# Flarum installation and configuration
-echo "Configuring Flarum..."
-
-# Initial setup using Flarum CLI
-docker-compose exec -T flarum flarum install \
-    --title="Riderwin Community" \
-    --admin="{{ flarum_admin_username }}" \
-    --password="{{ flarum_admin_password }}" \
-    --email="{{ flarum_admin_email }}" \
-    --dbhost=mysql \
-    --dbname="{{ mysql_database }}" \
-    --dbuser="{{ mysql_user }}" \
-    --dbpass="{{ mysql_password }}" \
-    --forum-url="{{ 'https://' + domain_name if domain_name else 'http://' + ansible_default_ipv4.address }}"
-
-# Install essential extensions
-echo "Installing essential extensions..."
-
-# SEO extension
-docker-compose exec -T flarum flarum extension:install flarum-seo
-
-# Image upload extension
-docker-compose exec -T flarum flarum extension:install flarum-markdown
-
-# Korean language pack (optional)
-# docker-compose exec -T flarum flarum extension:install flarum-lang-korean
-
-# Create configuration completion marker
-touch /opt/flarum/flarum_configured
-
-echo "Flarum configuration completed!"
-echo "Access your forum at: {{ 'https://' + domain_name if domain_name else 'http://' + ansible_default_ipv4.address }}"
+echo "Flarum is ready for initial configuration!"
+echo "Please complete the setup through the web interface."
+echo "Access your forum at: http://{{ ansible_default_ipv4.address }}"

@@ -260,38 +260,7 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
      - Store in a password manager
      - This is used by the Flarum application to connect to MySQL
 
-### 4. Flarum Administrator Configuration
-
-#### `FLARUM_ADMIN_EMAIL`
-
-- **Description**: Flarum administrator email
-- **Format**: Valid email address
-- **Example**: `admin@example.com`
-- **Detailed Setup Method**:
-  1. **Choose an Email Address**:
-     - Use your own email address or a dedicated admin email
-     - This will be the primary administrator account for your Flarum forum
-     - Example: `admin@yourdomain.com` or `your-email@example.com`
-  2. **Ensure Email is Accessible**:
-     - You'll receive important notifications at this email
-     - Make sure you can access this email account
-
-#### `FLARUM_ADMIN_PASSWORD`
-
-- **Description**: Flarum administrator password
-- **Format**: Strong password (minimum 12 characters, including special characters)
-- **Example**: `AdminSecurePass789!`
-
-### 5. Domain Configuration (Optional)
-
-#### `DOMAIN_NAME`
-
-- **Description**: Flarum forum domain (optional)
-- **Format**: Valid domain name
-- **Example**: `community.example.com`
-- **Note**: Leave empty to access via IP address
-
-### 6. Notification Configuration (Optional)
+### 4. Notification Configuration (Optional)
 
 #### `SLACK_WEBHOOK_URL`
 
@@ -338,13 +307,10 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 8. `SSH_PRIVATE_KEY`
 9. `MYSQL_ROOT_PASSWORD`
 10. `MYSQL_PASSWORD`
-11. `APP_ADMIN_EMAIL`
-12. `APP_ADMIN_PASSWORD`
 
 #### 🟢 **Optional**
 
-13. `DOMAIN_NAME`
-14. `SLACK_WEBHOOK_URL`
+11. `SLACK_WEBHOOK_URL`
 
 ## ✅ Secrets Setup Verification
 

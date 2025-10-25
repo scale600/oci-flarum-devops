@@ -15,13 +15,6 @@ mysql_database   = "flarum"
 mysql_user       = "flarum"
 mysql_password   = "your-secure-mysql-password"
 
-# Flarum 관리자 설정
-flarum_admin_email    = "admin@riderwin.com"
-flarum_admin_username = "admin"
-flarum_admin_password = "your-secure-flarum-admin-password"
-
-# 도메인 설정
-domain_name = "community.riderwin.com"
 
 # 프로젝트 설정
 project_name = "flarum-community"

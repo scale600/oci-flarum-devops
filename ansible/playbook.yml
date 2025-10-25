@@ -7,10 +7,6 @@
     mysql_database: "{{ MYSQL_DATABASE | default('flarum') }}"
     mysql_user: "{{ MYSQL_USER | default('flarum') }}"
     mysql_password: "{{ MYSQL_PASSWORD }}"
-    flarum_admin_email: "{{ FLARUM_ADMIN_EMAIL }}"
-    flarum_admin_username: "{{ FLARUM_ADMIN_USERNAME | default('admin') }}"
-    flarum_admin_password: "{{ FLARUM_ADMIN_PASSWORD }}"
-    domain_name: "{{ DOMAIN_NAME | default('') }}"
     flarum_data_dir: "/opt/flarum"
     docker_compose_version: "2.21.0"
 
@@ -117,20 +113,12 @@
         delay: 30
         timeout: 300
 
-    - name: Configure Flarum (if not already configured)
-      shell: |
-        cd {{ flarum_data_dir }}
-        ./configure-flarum.sh
-      become_user: opc
-      ignore_errors: yes
-
-    - name: Setup SSL certificate (if domain is provided)
-      shell: |
-        cd {{ flarum_data_dir }}
-        ./setup-ssl.sh
-      become_user: opc
-      when: domain_name != ""
-      ignore_errors: yes
+    - name: Display Flarum setup information
+      debug:
+        msg: |
+          Flarum is now running!
+          Access your forum at: http://{{ ansible_default_ipv4.address }}
+          Complete the initial setup through the web interface.
 
     - name: Create health check script
       template:
