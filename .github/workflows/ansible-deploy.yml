@@ -81,7 +81,6 @@ jobs:
           echo "Ansible deployment is handled by main.yml workflow"
           echo "This workflow is for manual testing only"
 
-
   ansible-rollback:
     name: Ansible Rollback
     runs-on: ubuntu-latest

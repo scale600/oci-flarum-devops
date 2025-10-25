@@ -112,4 +112,3 @@ jobs:
         run: |
           echo "Docker images built and pushed successfully!"
           echo "Deployment will be handled by main.yml workflow"
-

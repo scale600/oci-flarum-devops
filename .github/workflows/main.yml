@@ -394,4 +394,3 @@ jobs:
           echo "1. Wait for instances to fully initialize (5-10 minutes)" >> $GITHUB_STEP_SUMMARY
           echo "2. Access the application URL to complete setup" >> $GITHUB_STEP_SUMMARY
           echo "3. Configure SSL certificate if domain is set up" >> $GITHUB_STEP_SUMMARY
-

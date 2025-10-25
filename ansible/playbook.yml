@@ -32,12 +32,32 @@
       ansible.builtin.dnf:
         name:
           - docker
-          - docker-compose
           - git
           - curl
           - firewalld
         state: present
         update_cache: false
+
+    - name: Install Docker Compose manually
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-linux-x86_64"
+        dest: /usr/local/bin/docker-compose
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: Create docker-compose symlink
+      ansible.builtin.file:
+        src: /usr/local/bin/docker-compose
+        dest: /usr/bin/docker-compose
+        state: link
+        owner: root
+        group: root
+
+    - name: Verify docker-compose installation
+      ansible.builtin.command: docker-compose --version
+      register: docker_compose_version_check
+      changed_when: false
 
     - name: Start and enable Docker service
       ansible.builtin.systemd:
@@ -89,14 +109,6 @@
         group: opc
         mode: "0755"
 
-    - name: Create SSL setup script
-      ansible.builtin.template:
-        src: setup-ssl.sh.j2
-        dest: "{{ flarum_data_dir }}/setup-ssl.sh"
-        owner: opc
-        group: opc
-        mode: "0755"
-
     - name: Configure firewall rules
       ansible.posix.firewalld:
         port: "{{ item }}"
@@ -129,30 +141,3 @@
           Flarum is now running!
           Access your forum at: http://{{ ansible_default_ipv4.address }}
           Complete the initial setup through the web interface.
-
-    - name: Create health check script
-      ansible.builtin.template:
-        src: health-check.sh.j2
-        dest: "{{ flarum_data_dir }}/health-check.sh"
-        owner: opc
-        group: opc
-        mode: "0755"
-
-    - name: Create systemd service for health monitoring
-      ansible.builtin.template:
-        src: flarum-health.service.j2
-        dest: /etc/systemd/system/flarum-health.service
-        mode: "0644"
-      notify: Reload systemd
-
-    - name: Start and enable health monitoring service
-      ansible.builtin.systemd:
-        name: flarum-health
-        state: started
-        enabled: true
-        daemon_reload: true
-
-  handlers:
-    - name: Reload systemd
-      ansible.builtin.systemd:
-        daemon_reload: true

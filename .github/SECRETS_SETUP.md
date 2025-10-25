@@ -260,7 +260,6 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
      - Store in a password manager
      - This is used by the Flarum application to connect to MySQL
 
-
 ## 🛠️ GitHub Secrets Setup Method
 
 ### 1. Setting up Secrets in GitHub Repository
@@ -298,7 +297,6 @@ This document explains how to set up the GitHub Secrets required for the GitHub 
 8. `SSH_PRIVATE_KEY`
 9. `MYSQL_ROOT_PASSWORD`
 10. `MYSQL_PASSWORD`
-
 
 ## ✅ Secrets Setup Verification
 
