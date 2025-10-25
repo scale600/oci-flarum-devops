@@ -11,22 +11,22 @@
     docker_compose_version: "2.21.0"
 
   tasks:
-    - name: Create swap file for high performance instance
+    - name: Create swap file for micro instance
       ansible.builtin.shell: |
         set -o pipefail
-        # Create 1GB swap file (sufficient for high performance instance)
-        sudo fallocate -l 1G /swapfile
+        # Create 2GB swap file for micro instance
+        sudo fallocate -l 2G /swapfile
         sudo chmod 600 /swapfile
         sudo mkswap /swapfile
         sudo swapon /swapfile
         echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
       changed_when: false
 
-    - name: Update system packages (high performance instance)
-      ansible.builtin.dnf:
-        name: "*"
-        state: latest
-        update_cache: true
+    - name: Skip system package update (too slow on micro instance)
+      ansible.builtin.shell: |
+        echo "Skipping system package update on micro instance - too slow"
+        echo "Installing only essential packages..."
+      changed_when: false
 
     - name: Install essential packages only
       ansible.builtin.dnf:
