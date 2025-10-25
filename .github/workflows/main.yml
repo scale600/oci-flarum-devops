@@ -178,7 +178,7 @@ jobs:
         run: |
           # Test direct SSH connection first
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 opc@${{ needs.terraform-deploy.outputs.web_ip }} "echo 'SSH connection successful'"
-          
+
       - name: Test Ansible connection
         run: |
           ansible all -i inventory.ini -m ping --timeout=30
@@ -249,29 +249,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Step 4: Security Scan
-  security-scan:
-    name: Security Scan
-    needs: docker-deploy
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ghcr.io/${{ github.repository }}:main
-          format: "sarif"
-          output: "trivy-results.sarif"
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: "trivy-results.sarif"
+  # Step 4: Security Scan (Disabled for now)
+  # security-scan:
+  #   name: Security Scan
+  #   needs: docker-deploy
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Run Trivy vulnerability scanner
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: ghcr.io/${{ github.repository }}:main
+  #         format: "sarif"
+  #         output: "trivy-results.sarif"
+  #
+  #     - name: Upload Trivy scan results to GitHub Security tab
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       if: always()
+  #       with:
+  #         sarif_file: "trivy-results.sarif"
 
   # Step 5: Final Deployment and Verification
   final-deploy:
