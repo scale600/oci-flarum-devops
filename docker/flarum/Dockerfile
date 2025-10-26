@@ -1,29 +1,29 @@
-# Flarum 커스텀 이미지
+# Flarum Custom Image
 FROM mondedie/flarum:stable
 
-# 한국어 지원을 위한 추가 패키지 설치
+# Install additional packages for enhanced functionality
 RUN apk add --no-cache \
     curl \
     wget \
     unzip
 
-# Flarum 확장 프로그램 디렉토리 생성
+# Create Flarum extensions directory
 RUN mkdir -p /flarum/app/extensions
 
-# 확장 프로그램은 런타임에 설치하도록 변경
-# 기본 Flarum 이미지 사용 (확장 프로그램 설치 제거)
+# Extensions will be installed at runtime
+# Use base Flarum image (extension installation removed)
 
-# Flarum 설정 스크립트
+# Flarum setup script
 COPY flarum-setup.sh /usr/local/bin/flarum-setup.sh
 RUN chmod +x /usr/local/bin/flarum-setup.sh
 
-# 헬스체크 추가
+# Add health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
-# 포트 노출
+# Expose ports
 EXPOSE 80 443
 
-# 시작 스크립트
+# Startup script
 ENTRYPOINT ["/usr/local/bin/flarum-setup.sh"]
 CMD ["flarum", "start"]

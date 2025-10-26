@@ -1,4 +1,4 @@
-# OCI Provider 설정
+# OCI Provider Configuration
 terraform {
   required_version = ">= 1.0"
   required_providers {
@@ -9,7 +9,7 @@ terraform {
   }
 }
 
-# OCI Provider 구성
+# OCI Provider Setup
 provider "oci" {
   tenancy_ocid         = var.tenancy_ocid
   user_ocid            = var.user_ocid
@@ -18,12 +18,12 @@ provider "oci" {
   region               = var.region
 }
 
-# 데이터 소스 - 가용성 도메인 정보
+# Data Source - Availability Domain Information
 data "oci_identity_availability_domains" "ads" {
   compartment_id = var.compartment_id
 }
 
-# 데이터 소스 - 이미지 정보 (Oracle Linux 8)
+# Data Source - Image Information (Oracle Linux 8)
 data "oci_core_images" "oracle_linux" {
   compartment_id   = var.compartment_id
   operating_system = "Oracle Linux"
@@ -33,7 +33,7 @@ data "oci_core_images" "oracle_linux" {
   sort_order       = "DESC"
 }
 
-# VCN 생성
+# VCN Creation
 resource "oci_core_vcn" "flarum_vcn" {
   compartment_id = var.compartment_id
   display_name   = "flarum-vcn"
@@ -41,14 +41,14 @@ resource "oci_core_vcn" "flarum_vcn" {
   dns_label      = "flarumvcn"
 }
 
-# 인터넷 게이트웨이
+# Internet Gateway
 resource "oci_core_internet_gateway" "flarum_igw" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.flarum_vcn.id
   display_name   = "flarum-internet-gateway"
 }
 
-# 공용 서브넷
+# Public Subnet
 resource "oci_core_subnet" "flarum_public_subnet" {
   compartment_id      = var.compartment_id
   vcn_id              = oci_core_vcn.flarum_vcn.id
@@ -60,7 +60,7 @@ resource "oci_core_subnet" "flarum_public_subnet" {
   security_list_ids    = [oci_core_security_list.flarum_public_security_list.id]
 }
 
-# 프라이빗 서브넷 (데이터베이스용)
+# Private Subnet (for Database)
 resource "oci_core_subnet" "flarum_private_subnet" {
   compartment_id      = var.compartment_id
   vcn_id              = oci_core_vcn.flarum_vcn.id
@@ -72,7 +72,7 @@ resource "oci_core_subnet" "flarum_private_subnet" {
   security_list_ids    = [oci_core_security_list.flarum_private_security_list.id]
 }
 
-# 공용 라우트 테이블
+# Public Route Table
 resource "oci_core_route_table" "flarum_public_route_table" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.flarum_vcn.id
@@ -85,20 +85,20 @@ resource "oci_core_route_table" "flarum_public_route_table" {
   }
 }
 
-# 프라이빗 라우트 테이블
+# Private Route Table
 resource "oci_core_route_table" "flarum_private_route_table" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.flarum_vcn.id
   display_name   = "flarum-private-route-table"
 }
 
-# 공용 보안 리스트
+# Public Security List
 resource "oci_core_security_list" "flarum_public_security_list" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.flarum_vcn.id
   display_name   = "flarum-public-security-list"
 
-  # SSH 접근 허용
+  # Allow SSH Access
   ingress_security_rules {
     protocol  = "6"
     source    = "0.0.0.0/0"
@@ -109,7 +109,7 @@ resource "oci_core_security_list" "flarum_public_security_list" {
     }
   }
 
-  # HTTP 접근 허용
+  # Allow HTTP Access
   ingress_security_rules {
     protocol  = "6"
     source    = "0.0.0.0/0"
@@ -120,7 +120,7 @@ resource "oci_core_security_list" "flarum_public_security_list" {
     }
   }
 
-  # HTTPS 접근 허용
+  # Allow HTTPS Access
   ingress_security_rules {
     protocol  = "6"
     source    = "0.0.0.0/0"
@@ -131,7 +131,7 @@ resource "oci_core_security_list" "flarum_public_security_list" {
     }
   }
 
-  # 모든 아웃바운드 트래픽 허용
+  # Allow All Outbound Traffic
   egress_security_rules {
     protocol    = "all"
     destination = "0.0.0.0/0"
@@ -139,13 +139,13 @@ resource "oci_core_security_list" "flarum_public_security_list" {
   }
 }
 
-# 프라이빗 보안 리스트 (데이터베이스용)
+# Private Security List (for Database)
 resource "oci_core_security_list" "flarum_private_security_list" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.flarum_vcn.id
   display_name   = "flarum-private-security-list"
 
-  # MySQL 포트 (3306) - 공용 서브넷에서만 접근
+  # MySQL Port (3306) - Access from Public Subnet Only
   ingress_security_rules {
     protocol  = "6"
     source    = "10.0.1.0/24"
@@ -156,7 +156,7 @@ resource "oci_core_security_list" "flarum_private_security_list" {
     }
   }
 
-  # 모든 아웃바운드 트래픽 허용
+  # Allow All Outbound Traffic
   egress_security_rules {
     protocol    = "all"
     destination = "0.0.0.0/0"
@@ -164,7 +164,7 @@ resource "oci_core_security_list" "flarum_private_security_list" {
   }
 }
 
-# Compute 인스턴스 (Flarum 웹서버)
+# Compute Instance (Flarum Web Server)
 resource "oci_core_instance" "flarum_instance" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
@@ -199,4 +199,4 @@ resource "oci_core_instance" "flarum_instance" {
   }
 }
 
-# MySQL 인스턴스 제거 - Docker 컨테이너로 통합
+# MySQL Instance Removed - Integrated with Docker Container
