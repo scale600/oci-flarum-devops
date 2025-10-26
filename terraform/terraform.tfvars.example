@@ -1,4 +1,4 @@
-# OCI 인증 정보 (실제 값으로 교체 필요)
+# OCI Authentication Information (Replace with actual values)
 tenancy_ocid     = "ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 user_ocid        = "ocid1.user.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 fingerprint      = "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
@@ -6,16 +6,16 @@ private_key_path = "~/.oci/oci_api_key.pem"
 region          = "ap-seoul-1"
 compartment_id  = "ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-# SSH 공개키 (실제 공개키로 교체 필요)
+# SSH Public Key (Replace with actual public key)
 ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... your-ssh-public-key"
 
-# MySQL 데이터베이스 설정
+# MySQL Database Configuration
 mysql_root_password = "your-secure-mysql-root-password"
 mysql_database   = "flarum"
 mysql_user       = "flarum"
 mysql_password   = "your-secure-mysql-password"
 
 
-# 프로젝트 설정
+# Project Configuration
 project_name = "flarum-community"
 environment  = "production"

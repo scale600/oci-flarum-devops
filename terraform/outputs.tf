@@ -1,4 +1,4 @@
-# Flarum 웹서버 정보
+# Flarum Web Server Information
 output "flarum_instance_public_ip" {
   description = "Public IP address of Flarum instance"
   value       = oci_core_instance.flarum_instance.public_ip
@@ -14,9 +14,9 @@ output "flarum_instance_ocid" {
   value       = oci_core_instance.flarum_instance.id
 }
 
-# MySQL은 Docker 컨테이너로 통합됨
+# MySQL is integrated as Docker container
 
-# 네트워크 정보
+# Network Information
 output "vcn_id" {
   description = "VCN OCID"
   value       = oci_core_vcn.flarum_vcn.id
@@ -32,7 +32,7 @@ output "private_subnet_id" {
   value       = oci_core_subnet.flarum_private_subnet.id
 }
 
-# 접속 정보
+# Connection Information
 output "flarum_url" {
   description = "Flarum site URL"
   value       = "http://${oci_core_instance.flarum_instance.public_ip}"
@@ -43,7 +43,7 @@ output "ssh_connection_command" {
   value       = "ssh opc@${oci_core_instance.flarum_instance.public_ip}"
 }
 
-# MySQL 연결 정보 (Docker 컨테이너)
+# MySQL Connection Information (Docker Container)
 output "mysql_connection_info" {
   description = "MySQL connection information (Docker container)"
   value = {
@@ -55,7 +55,7 @@ output "mysql_connection_info" {
   sensitive = true
 }
 
-# 리소스 요약
+# Resource Summary
 output "resource_summary" {
   description = "Summary of created resources"
   value = {

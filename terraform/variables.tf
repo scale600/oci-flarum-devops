@@ -1,4 +1,4 @@
-# OCI 인증 정보
+# OCI Authentication Information
 variable "tenancy_ocid" {
   description = "OCI Tenancy OCID"
   type        = string
@@ -31,13 +31,13 @@ variable "compartment_id" {
   type        = string
 }
 
-# SSH 키 설정
+# SSH Key Configuration
 variable "ssh_public_key" {
   description = "SSH Public Key for instance access"
   type        = string
 }
 
-# MySQL 데이터베이스 설정
+# MySQL Database Configuration
 variable "mysql_root_password" {
   description = "MySQL root password"
   type        = string
@@ -63,7 +63,7 @@ variable "mysql_password" {
 }
 
 
-# 태그 설정
+# Tag Configuration
 variable "project_name" {
   description = "Project name for tagging"
   type        = string
